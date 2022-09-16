@@ -4,7 +4,9 @@ class Maze3D {
     constructor(maze) {
         this.#maze = maze;
     }
-
+    get maze(){
+        return this.#maze;
+    }
     toString() {
         for (let q = 0; q < this.#maze.length; q++) {
             console.log(`\nLevel ${q}\n`);
@@ -44,3 +46,5 @@ class Maze3D {
         }
     }
 }
+
+export default Maze3D;
