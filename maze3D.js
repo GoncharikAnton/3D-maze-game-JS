@@ -18,27 +18,39 @@ class Maze3D {
                 for (let j = 0; j < this.#maze[q][0].length; j++) {
                     const cell = this.#maze[q][i][j];
                     const nextCell = this.#maze[q][i][j + 1];
-                    cell[2] ? strTop += '    ' : strTop += '+--+';
-                    cell[0] ? strMid += ' ' : strMid += '|';
+                    const prevCell = this.#maze[q][i][j - 1];
+                    cell[2] ? strTop += '  ' : strTop += '+-';
+                    nextCell && !prevCell ? strMid += '|' : strMid += '';
                     if (cell[4] && cell[5]) {
                         strMid += '↕';
+                    } else if (cell[4]) {
+                        cell[4] === true ? strMid += '↑' : strMid += cell[4]
+                    } else if (cell[5]) {
+                        cell[5] === true ? strMid += '↓' : strMid += cell[5]
                     } else {
-                        cell[4] ? strMid += '↑' : strMid += ' ';
-                        cell[5] ? strMid += '↓' : strMid += ' ';
+                        strMid += ' '
                     }
-                    if (nextCell) {
-                        cell[1] === nextCell[0] ? strMid += ' ' : strMid += '|';
-                    } else {
+                    if (nextCell && !prevCell) {
+                        cell[1] ? strMid += ' ' : strMid += '|';
+                    }
+                    if (prevCell) {
                         cell[1] ? strMid += ' ' : strMid += '|';
                     }
                     if (!nextRow) {
-                        cell[3] ? strBottom += '    ' : strBottom += '+--+';
+                        if (j === 0) {
+                            strBottom += '|-';
+                        } else {
+                            strBottom += '+-';
+                        }
                     }
 
                 }
-                console.log(strTop);
+                strTop = strTop.split('')
+                strTop.splice(0, 1, '|')
+                strTop = strTop.join('')
+                console.log(strTop + '|');
                 console.log(strMid);
-                strBottom && console.log(strBottom);
+                strBottom && console.log(strBottom + '|');
                 strBottom = ''
                 strMid = ''
                 strTop = ''

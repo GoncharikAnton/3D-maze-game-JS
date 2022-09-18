@@ -81,27 +81,39 @@ class Maze3D {
                 for (let j = 0; j < this.#maze[q][0].length; j++) {
                     const cell = this.#maze[q][i][j];
                     const nextCell = this.#maze[q][i][j + 1];
-                    cell[2] ? strTop += '    ' : strTop += '+--+';
-                    cell[0] ? strMid += ' ' : strMid += '|';
+                    const prevCell = this.#maze[q][i][j - 1];
+                    cell[2] ? strTop += '  ' : strTop += '+-';
+                    nextCell && !prevCell ? strMid += '|' : strMid += '';
                     if (cell[4] && cell[5]) {
                         strMid += '↕';
+                    } else if (cell[4]) {
+                        cell[4] === true ? strMid += '↑' : strMid += cell[4]
+                    } else if (cell[5]) {
+                        cell[5] === true ? strMid += '↓' : strMid += cell[5]
                     } else {
-                        cell[4] ? strMid += '↑' : strMid += ' ';
-                        cell[5] ? strMid += '↓' : strMid += ' ';
+                        strMid += ' '
                     }
-                    if (nextCell) {
-                        cell[1] === nextCell[0] ? strMid += ' ' : strMid += '|';
-                    } else {
+                    if (nextCell && !prevCell) {
+                        cell[1] ? strMid += ' ' : strMid += '|';
+                    }
+                    if (prevCell) {
                         cell[1] ? strMid += ' ' : strMid += '|';
                     }
                     if (!nextRow) {
-                        cell[3] ? strBottom += '    ' : strBottom += '+--+';
+                        if (j === 0) {
+                            strBottom += '|-';
+                        } else {
+                            strBottom += '+-';
+                        }
                     }
 
                 }
-                console.log(strTop);
+                strTop = strTop.split('')
+                strTop.splice(0, 1, '|')
+                strTop = strTop.join('')
+                console.log(strTop + '|');
                 console.log(strMid);
-                strBottom && console.log(strBottom);
+                strBottom && console.log(strBottom + '|');
                 strBottom = ''
                 strMid = ''
                 strTop = ''
@@ -110,73 +122,73 @@ class Maze3D {
     }
 }
 
-class DFSMaze3dGenerator extends Maze3dGenerator {
-    #maze
+// class DFSMaze3dGenerator extends Maze3dGenerator {
+//     #maze
+//
+//     constructor() {
+//         super();
+//     }
+//
+//     generate(rows, cols) {
+//         const directions = [
+//             [0, 1], // right
+//             [0, -1], // left
+//             [-1, 0], // up
+//             [1, 0] // down
+//         ]
+//         this.#maze = super.generate(rows, cols);
+//         const stack = [];
+//         const visited = new Map();
+//         let initCell = this.#maze.maze[0][0][0];
+//         visited.set('000', true);
+//         stack.push(initCell);
+//         let currCell = initCell;
+//         while (stack.length > 0) {
+//             for (let i = 0; i < this.#maze.maze.length; i++) {
+//                 for (let j = 0; j < this.#maze.maze[i].length; j++) {
+//                     for (let k = 0; k < this.#maze.maze[i][j].length; k++) {
+//                         for (let l = 0; l < 4; l++) {
+//                             const [a, b] = directions[l]
+//                             if( j + a >= 0 && k + b >= 0 && j + a <= rows - 1 && k + b <= cols - 1){
+//                                 if (!visited.has(`${i}${j + a}${k + b}`)) {
+//                                     let unvisitedNeighbor = this.#maze.maze[i][j + a][k + b]
+//                                     console.log(i, j+a, k+b)
+//                                     if (b === 1) {
+//                                         currCell[1] = true;
+//                                         unvisitedNeighbor[0] = true;
+//                                     }
+//                                     if (b === -1) {
+//                                         currCell[0] = true;
+//                                         unvisitedNeighbor[1] = true;
+//                                     }
+//                                     if (a === 1) {
+//                                         currCell[3] = true;
+//                                         unvisitedNeighbor[2] = true;
+//                                     }
+//                                     if (a === -1) {
+//                                         currCell[2] = true;
+//                                         unvisitedNeighbor[3] = true;
+//                                     }
+//                                     visited.set(`${i}${j + a}${k + b}`, true);
+//                                     stack.push(this.#maze.maze[i][j + a][k + b]);
+//                                     currCell = this.#maze.maze[i][j + a][k + b]
+//                                 } else {
+//                                     currCell = stack.pop()
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//
+//         }
+//         return this.#maze
+//     }
+//
+// }
 
-    constructor() {
-        super();
-    }
-
-    generate(rows, cols) {
-        const directions = [
-            [0, 1], // right
-            [0, -1], // left
-            [-1, 0], // up
-            [1, 0] // down
-        ]
-        this.#maze = super.generate(rows, cols);
-        const stack = [];
-        const visited = new Map();
-        let initCell = this.#maze.maze[0][0][0];
-        visited.set('000', true);
-        stack.push(initCell);
-        let currCell = initCell;
-        while (stack.length > 0) {
-            for (let i = 0; i < this.#maze.maze.length; i++) {
-                for (let j = 0; j < this.#maze.maze[i].length; j++) {
-                    for (let k = 0; k < this.#maze.maze[i][j].length; k++) {
-                        for (let l = 0; l < 4; l++) {
-                            const [a, b] = directions[l]
-                            if( j + a >= 0 && k + b >= 0 && j + a <= rows - 1 && k + b <= cols - 1){
-                                if (!visited.has(`${i}${j + a}${k + b}`)) {
-                                    let unvisitedNeighbor = this.#maze.maze[i][j + a][k + b]
-                                    console.log(i, j+a, k+b)
-                                    if (b === 1) {
-                                        currCell[1] = true;
-                                        unvisitedNeighbor[0] = true;
-                                    }
-                                    if (b === -1) {
-                                        currCell[0] = true;
-                                        unvisitedNeighbor[1] = true;
-                                    }
-                                    if (a === 1) {
-                                        currCell[3] = true;
-                                        unvisitedNeighbor[2] = true;
-                                    }
-                                    if (a === -1) {
-                                        currCell[2] = true;
-                                        unvisitedNeighbor[3] = true;
-                                    }
-                                    visited.set(`${i}${j + a}${k + b}`, true);
-                                    stack.push(this.#maze.maze[i][j + a][k + b]);
-                                    currCell = this.#maze.maze[i][j + a][k + b]
-                                } else {
-                                    currCell = stack.pop()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-        return this.#maze
-    }
-
-}
-
+const mazeGen = new SimpleMaze3dGenerator()
 // const mazeGen = new SimpleMaze3dGenerator()
-const mazeGen = new DFSMaze3dGenerator()
+// const mazeGen = new DFSMaze3dGenerator()
 const maze = mazeGen.generate(6, 6);
-console.log(maze.maze)
 maze.toString()
