@@ -7,12 +7,11 @@ class Cell {
         this.rightPass = false;
         this.topPass = false;
         this.bottomPass = false;
-        // this.visited = false;
-        this.isPath = false;
         this.upPass = false;
         this.downPass = false;
         this.isExit = false;
         this.isEntrance = false;
+        this.visited = false;
     }
 }
 
@@ -75,7 +74,7 @@ class Maze3dGenerator {
                         exitCell = cell;
                         exitCell.isExit = true;
                         exitCell.upPass = false;
-                        exitCell.dawnPass = false;
+                        exitCell.downPass = false;
                     }
                 }
             }
@@ -96,7 +95,6 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
     }
 
     #carveThePath() {
-        const stack = [];
         const visited = new Map();
         const directions = [
             [0, 0, 1], // right
@@ -106,18 +104,14 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
             [1, 0, 0], // up
             [-1, 0, 0], // down
         ];
-        // const maze = this.#maze.maze;
         const maze = this.#maze;
         const levels = maze.maze.length;
         const rows = maze.maze[0].length;
         const cols = maze.maze[0][0].length;
-        // console.log(maze.entranceCell)
-        // console.log(maze.exitCell)
         let [entrL, entrR, entrC] = [maze.entranceCell.levelNum, maze.entranceCell.rowNum, maze.entranceCell.colNum]
         let [extL, extR, extC] = [maze.exitCell.levelNum, maze.exitCell.rowNum, maze.exitCell.colNum]
-        stack.push(maze.entranceCell)
         let currCell = maze.entranceCell;
-        visited.set(`${entrL}${entrR}${entrC}`, currCell)
+        visited.set(`${entrL}${entrR}${entrC}`, currCell);
         while (!visited.has(`${extL}${extR}${extC}`)) {
             const randomChoice = Randomizer.randomNumMinMax(0, 5);
             const [l, r, c] = directions[randomChoice];
@@ -133,15 +127,15 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
                         directions[2] = [0, 0, 0];
                         directions[3] = [0, 0, 0];
                     }
-                    visited.set(`${entrL}${entrR}${entrC}`, [l, r, c])
-                    entrL = entrL + l
-                    entrR = entrR + r
-                    entrC = entrC + c
+                    visited.set(`${entrL}${entrR}${entrC}`, [l, r, c]);
+                    entrL = entrL + l;
+                    entrR = entrR + r;
+                    entrC = entrC + c;
                 }
             }
 
         }
-        return visited
+        return visited;
     }
 
 
@@ -181,24 +175,22 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
             const path = this.#carveThePath()
             for (const [cellNum, pathDirection] of path.entries()) {
                 let [l, r, c] = cellNum;
-                const cell = this.#maze.maze[+l][+r][+c]
+                const cell = this.#maze.maze[+l][+r][+c];
                 if (pathDirection[0]) {
                     pathDirection === 1 ? cell.upPass = true : cell.downPass = true;
                 }
                 if (pathDirection[1]) {
                     if (pathDirection[1] === -1) {
-                        cell.topPass = true
-                        const nextCell = this.#maze.maze[+l][+r-1][+c]
-                        if(nextCell){
+                        cell.topPass = true;
+                        const nextCell = this.#maze.maze[+l][+r - 1][+c];
+                        if (nextCell) {
                             nextCell.bottomPass = true;
-                            nextCell.isPath = true
                         }
                     } else {
-                        cell.bottomPass = true
-                        const nextCell = this.#maze.maze[+l][+r+1][+c]
-                        if(nextCell){
+                        cell.bottomPass = true;
+                        const nextCell = this.#maze.maze[+l][+r + 1][+c];
+                        if (nextCell) {
                             nextCell.topPass = true;
-                            nextCell.isPath = true;
                         }
 
                     }
@@ -206,22 +198,19 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
                 if (pathDirection[2]) {
                     if (pathDirection[2] === 1) {
                         cell.rightPass = true;
-                        const nextCell = this.#maze.maze[+l][+r][+c+1];
-                        if(nextCell){
+                        const nextCell = this.#maze.maze[+l][+r][+c + 1];
+                        if (nextCell) {
                             nextCell.leftPass = true;
-                            nextCell.isPath = true;
                         }
 
                     } else {
                         cell.leftPass = true;
-                        const nextCell = this.#maze.maze[+l][+r][+c-1]
-                        if(nextCell){
+                        const nextCell = this.#maze.maze[+l][+r][+c - 1];
+                        if (nextCell) {
                             nextCell.rightPass = true;
-                            nextCell.isPath = true;
                         }
                     }
                 }
-                cell.isPath = true;
             }
         }
         return this.#maze;
@@ -270,16 +259,18 @@ class Maze3D {
                     const prevCell = this.#maze[i][j][k - 1];
                     cell.topPass ? strTop += '  ' : strTop += '+-';
                     nextCell && !prevCell ? strMid += '|' : strMid += '';
-                    if (cell.upPass && cell.downPass) {
+                    if (cell.isExit || cell.isEntrance) {
+                        cell.isEntrance ? strMid += 'S' : strMid += 'E';
+                        cell.upPass = false;
+                        cell.downPass = false;
+                    } else if (cell.upPass && cell.downPass) {
                         strMid += '↕';
                     } else if (cell.upPass) {
                         cell.upPass === true ? strMid += '↑' : strMid += '';
                     } else if (cell.downPass) {
                         cell.downPass === true ? strMid += '↓' : strMid += '';
-                    } else if (cell.isExit || cell.isEntrance) {
-                        cell.isEntrance ? strMid += 'S' : strMid += 'E';
                     } else {
-                        strMid += ' '
+                        strMid += ' ';
                     }
                     if (nextCell && !prevCell) {
                         cell.rightPass ? strMid += ' ' : strMid += '|';
@@ -316,72 +307,101 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         super();
     }
 
-    generate(rows, cols) {
+    /**
+     *
+     * @param {Cell} cell
+     * @param {Number} rows
+     * @param {Number} cols
+     */
+    #getUnvisitedNeighbors(cell, rows, cols){
         const directions = [
             [0, 0, 1], // right
             [0, 0, -1], // left
             [0, -1, 0], // top
-            [0, 1, 0] // bottom
-            // [1, 0, 0 ] // up
-            // [-1, 0, 0] // down
-            // [0, 0, 0] // upDown
+            [0, 1, 0], // bottom
+            [1, 0, 0], // up
+            [-1, 0, 0], // down
         ]
-        this.#maze = super.generate(rows, cols);
-        let i = 0;
-        const stack = [];
-        const visited = new Map();
-        let initCell = this.#maze.maze[0][0][0];
-        visited.set('000', initCell);
-        stack.push(initCell);
-        let currCell = initCell;
-        while (stack.length > 0) {
-            // for (let i = 0; i < this.#maze.maze.length; i++) {
-            for (i = 0; i < 1; i++) {
-                for (let j = 0; j < rows; j++) {
-                    // for (let k = 0; k < cols; k++) {
-                    let randomNumTo3 = Randomizer.randomNumMinMax(0, 3)
-                    const [a, b] = directions[randomNumTo3]
-                    if (j + a >= 0 && k + b >= 0 && j + a <= rows - 1 && k + b <= cols - 1) {
-                        if (!visited.has(`${i}${j + a}${k + b}`)) {
-                            let unvisitedNeighbor = this.#maze.maze[i][j + a][k + b]
-                            // console.log(i, j + a, k + b)
-                            // console.log(i, j , k )
-                            // console.log(currCell)
-                            if (b === 1) {
-                                currCell.rightPass = true;
-                                unvisitedNeighbor.leftPass = true;
-                            }
-                            if (b === -1) {
-                                currCell.leftPass = true;
-                                unvisitedNeighbor.rightPass = true;
-                            }
-                            if (a === 1) {
-                                currCell.bottomPass = true;
-                                unvisitedNeighbor.topPass = true;
-                            }
-                            if (a === -1) {
-                                currCell.topPass = true;
-                                unvisitedNeighbor.bottomPass = true;
-                            }
-                            visited.set(`${i}${j + a}${k + b}`, unvisitedNeighbor);
-                            stack.push(unvisitedNeighbor);
-                            currCell = unvisitedNeighbor;
-
-                        } else {
-                            currCell = stack.pop()
-                        }
-                    }
-                    // }
+        const neighbors = [];
+        let [l,r,c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
+        for (let i = 0; i < directions.length; i++) {
+            const [dirL, dirR, dirC] = directions[i];
+            if((l+dirL < 3 && l+dirL >= 0) && (r+dirR < rows && r+dirR >= 0) && (c+dirC < cols && c+dirC >= 0)){
+                const neighborCell = this.#maze.maze[l+dirL][r+dirR][c+dirC];
+                if(neighborCell.visited === false){
+                    neighbors.push(`${l+dirL}${r+dirR}${c+dirC}`)
                 }
             }
         }
-        return this.#maze
+        return neighbors;
     }
 
+    /**
+     *
+     * @param {Cell} currCell
+     * @param {Cell} neighbor
+     */
+    #removeWalls(currCell, neighbor) {
+        //compare cells on z axis
+        let i = currCell.levelNum - neighbor.levelNum;
+        if (i === 1) {
+            currCell.downPass = true;
+            neighbor.upPass = true;
+        } else if (i === -1) {
+            currCell.upPass = true;
+            neighbor.downPass = true;
+        }
+
+        //compare cells on y axis
+        let j = currCell.rowNum - neighbor.rowNum;
+        if (j === 1) {
+            currCell.topPass = true;
+            neighbor.bottomPass = true;
+        } else if (j === -1) {
+            currCell.bottomPass = true;
+            neighbor.topPass = true;
+        }
+
+        //compare cells on x axis
+        let k = currCell.colNum - neighbor.colNum;
+        if (k === 1) {
+            currCell.leftPass = true;
+            neighbor.rightPass = true;
+        } else if (k === -1) {
+            currCell.rightPass = true;
+            neighbor.leftPass = true;
+        }
+    }
+    generate(rows, cols) {
+        this.#maze = super.generate(rows, cols);
+        const stack = [];
+        const visited = new Map();
+        let initCell = this.#maze.entranceCell;
+        visited.set(`${initCell.levelNum}${initCell.rowNum}${initCell.colNum}`, initCell);
+        stack.push(initCell);
+        let currCell = initCell;
+        while (stack.length > 0) {
+            const neighbors = this.#getUnvisitedNeighbors(currCell, rows, cols);
+            const randomNeighbor = neighbors[Randomizer.randomNumMinMax(0, neighbors.length - 1)]; // str of neighbor position [level][row][col]
+            if (neighbors.length > 0 && !visited.has(randomNeighbor)) {
+                let [l, r, c] = [+currCell.levelNum, +currCell.rowNum, +currCell.colNum];
+                const neighborCell = this.#maze.maze[+randomNeighbor[0]][+randomNeighbor[1]][+randomNeighbor[2]];
+                neighborCell.visited = true;
+                //remove the wall between cells//
+                this.#removeWalls(currCell, neighborCell);
+                visited.set(randomNeighbor, neighborCell);
+                stack.push(neighborCell);
+                currCell = neighborCell;
+
+            } else {
+                currCell = stack.pop();
+            }
+        }
+        return this.#maze;
+    }
 }
 
-// const mazeGen = new SimpleMaze3dGenerator()
 const mazeGen = new SimpleMaze3dGenerator()
-// const mazeGen = new DFSMaze3dGenerator()
+const mazeGen = new DFSMaze3dGenerator()
 const maze = mazeGen.generate(4, 4);
 maze.toString()
