@@ -105,7 +105,6 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
             [-1, 0, 0], // down
         ];
         const maze = this.#maze;
-        const levels = maze.maze.length;
         const rows = maze.maze[0].length;
         const cols = maze.maze[0][0].length;
         let [entrL, entrR, entrC] = [maze.entranceCell.levelNum, maze.entranceCell.rowNum, maze.entranceCell.colNum]
@@ -384,7 +383,6 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
             const neighbors = this.#getUnvisitedNeighbors(currCell, rows, cols);
             const randomNeighbor = neighbors[Randomizer.randomNumMinMax(0, neighbors.length - 1)]; // str of neighbor position [level][row][col]
             if (neighbors.length > 0 && !visited.has(randomNeighbor)) {
-                let [l, r, c] = [+currCell.levelNum, +currCell.rowNum, +currCell.colNum];
                 const neighborCell = this.#maze.maze[+randomNeighbor[0]][+randomNeighbor[1]][+randomNeighbor[2]];
                 neighborCell.visited = true;
                 //remove the wall between cells//
@@ -401,7 +399,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
     }
 }
 
-const mazeGen = new SimpleMaze3dGenerator()
+// const mazeGen = new SimpleMaze3dGenerator()
 const mazeGen = new DFSMaze3dGenerator()
 const maze = mazeGen.generate(4, 4);
 maze.toString()
