@@ -21,11 +21,98 @@ class Randomizer {
     }
 }
 
+class Maze3D {
+    #maze
+    #entranceCell
+    #exitCell
+
+    constructor(maze, entranceCell, exitCell) {
+        this.#maze = maze;
+        this.#entranceCell = entranceCell;
+        this.#exitCell = exitCell;
+    }
+
+    get maze() {
+        return this.#maze;
+    }
+
+
+    get entranceCell() {
+        return this.#entranceCell;
+    }
+
+    get exitCell() {
+        return this.#exitCell;
+    }
+
+
+    toString() {
+        for (let i = 0; i < this.#maze.length; i++) {
+            console.log(`\nLevel ${i}\n`);
+            for (let j = 0; j < this.#maze[i].length; j++) {
+                let strTop = '';
+                let strMid = '';
+                let strBottom = '';
+                const nextRow = this.#maze[i][j + 1];
+                for (let k = 0; k < this.#maze[i][0].length; k++) {
+                    const cell = this.#maze[i][j][k];
+                    const nextCell = this.#maze[i][j][k + 1];
+                    const prevCell = this.#maze[i][j][k - 1];
+                    cell.topPass ? strTop += '  ' : strTop += '+-';
+                    nextCell && !prevCell ? strMid += '|' : strMid += '';
+                    if (cell.isExit || cell.isEntrance) {
+                        cell.isEntrance ? strMid += 'S' : strMid += 'E';
+                        cell.upPass = false;
+                        cell.downPass = false;
+                    } else if (cell.upPass && cell.downPass) {
+                        strMid += '↕';
+                    } else if (cell.upPass) {
+                        cell.upPass === true ? strMid += '↑' : strMid += '';
+                    } else if (cell.downPass) {
+                        cell.downPass === true ? strMid += '↓' : strMid += '';
+                    } else {
+                        strMid += ' ';
+                    }
+                    if (nextCell && !prevCell) {
+                        cell.rightPass ? strMid += ' ' : strMid += '|';
+                    }
+                    if (prevCell) {
+                        cell.rightPass ? strMid += ' ' : strMid += '|';
+                    }
+                    if (!nextRow) {
+                        if (k === 0) {
+                            strBottom += '|-';
+                        } else {
+                            strBottom += '+-';
+                        }
+                    }
+                }
+                strTop = strTop.split('');
+                strTop.splice(0, 1, '|');
+                strTop = strTop.join('');
+                console.log(strTop + '|');
+                console.log(strMid);
+                strBottom && console.log(strBottom + '|');
+                strBottom = '';
+                strMid = '';
+                strTop = '';
+            }
+        }
+    }
+}
+
 class Maze3dGenerator {
     constructor() {
         if (this.constructor === Maze3dGenerator) {
             throw new Error('This is an abstract class.');
         }
+    }
+
+    measureAlgorithmTime(obj, rows,cols){
+        const startTime = Date.now();
+        obj.generate(rows, cols);
+        const endTime = Date.now();
+        return `Time of execution of generator - ${endTime - startTime}ms`
     }
 
     generate(rows, cols) {
@@ -81,10 +168,6 @@ class Maze3dGenerator {
         }
         return new Maze3D(maze, entranceCell, exitCell);
     }
-
-    measureAlgorithmTime() {
-        throw new Error('You have to implement the method "measureAlgorithmTime"!');
-    }
 }
 
 class SimpleMaze3dGenerator extends Maze3dGenerator {
@@ -93,6 +176,7 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
     constructor() {
         super();
     }
+
 
     #carveThePath() {
         const visited = new Map();
@@ -215,87 +299,8 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
         return this.#maze;
     }
 
-    measureAlgorithmTime() {
-        super.measureAlgorithmTime();
-    }
-}
-
-class Maze3D {
-    #maze
-    #entranceCell
-    #exitCell
-
-    constructor(maze, entranceCell, exitCell) {
-        this.#maze = maze;
-        this.#entranceCell = entranceCell;
-        this.#exitCell = exitCell;
-    }
-
-    get maze() {
-        return this.#maze;
-    }
-
-
-    get entranceCell() {
-        return this.#entranceCell;
-    }
-
-    get exitCell() {
-        return this.#exitCell;
-    }
-
-    toString() {
-        for (let i = 0; i < this.#maze.length; i++) {
-            console.log(`\nLevel ${i}\n`);
-            for (let j = 0; j < this.#maze[i].length; j++) {
-                let strTop = '';
-                let strMid = '';
-                let strBottom = '';
-                const nextRow = this.#maze[i][j + 1];
-                for (let k = 0; k < this.#maze[i][0].length; k++) {
-                    const cell = this.#maze[i][j][k];
-                    const nextCell = this.#maze[i][j][k + 1];
-                    const prevCell = this.#maze[i][j][k - 1];
-                    cell.topPass ? strTop += '  ' : strTop += '+-';
-                    nextCell && !prevCell ? strMid += '|' : strMid += '';
-                    if (cell.isExit || cell.isEntrance) {
-                        cell.isEntrance ? strMid += 'S' : strMid += 'E';
-                        cell.upPass = false;
-                        cell.downPass = false;
-                    } else if (cell.upPass && cell.downPass) {
-                        strMid += '↕';
-                    } else if (cell.upPass) {
-                        cell.upPass === true ? strMid += '↑' : strMid += '';
-                    } else if (cell.downPass) {
-                        cell.downPass === true ? strMid += '↓' : strMid += '';
-                    } else {
-                        strMid += ' ';
-                    }
-                    if (nextCell && !prevCell) {
-                        cell.rightPass ? strMid += ' ' : strMid += '|';
-                    }
-                    if (prevCell) {
-                        cell.rightPass ? strMid += ' ' : strMid += '|';
-                    }
-                    if (!nextRow) {
-                        if (k === 0) {
-                            strBottom += '|-';
-                        } else {
-                            strBottom += '+-';
-                        }
-                    }
-                }
-                strTop = strTop.split('');
-                strTop.splice(0, 1, '|');
-                strTop = strTop.join('');
-                console.log(strTop + '|');
-                console.log(strMid);
-                strBottom && console.log(strBottom + '|');
-                strBottom = '';
-                strMid = '';
-                strTop = '';
-            }
-        }
+    measureAlgorithmTime(rows, cols){
+        return super.measureAlgorithmTime(this, rows, cols)
     }
 }
 
@@ -307,7 +312,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
     }
 
     /**
-     *
+     * Method gets unvisited neighbors of the cell.
      * @param {Cell} cell
      * @param {Number} rows
      * @param {Number} cols
@@ -336,7 +341,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
     }
 
     /**
-     *
+     * Method removes walls between two cells in the maze.
      * @param {Cell} currCell
      * @param {Cell} neighbor
      */
@@ -371,6 +376,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
             neighbor.leftPass = true;
         }
     }
+
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
         const stack = [];
@@ -397,9 +403,15 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         }
         return this.#maze;
     }
+
+    measureAlgorithmTime(rows, cols){
+        return super.measureAlgorithmTime(this, rows, cols)
+    }
 }
 
-// const mazeGen = new SimpleMaze3dGenerator()
-const mazeGen = new DFSMaze3dGenerator()
+const mazeGen = new SimpleMaze3dGenerator()
+const mazeGenDFS = new DFSMaze3dGenerator()
 const maze = mazeGen.generate(4, 4);
+// console.log(mazeGen.measureAlgorithmTime(2000,2000))
+// console.log(mazeGenDFS.measureAlgorithmTime(2000,2000))
 maze.toString()
