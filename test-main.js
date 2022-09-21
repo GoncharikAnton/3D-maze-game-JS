@@ -1,3 +1,68 @@
+//----------------------------------------SEARCH ALGORITHMS------------------------------------------------------------
+class Searchable {
+    constructor() {
+        if(this.constructor === Searchable){
+            throw new Error('Searchable is an abstract class.')
+        }
+    }
+}
+function BFSSearch(Graph, root) { // G - generated maze, root - startCell
+    const Q = [];
+    const goal = `${Graph.exitCell.levelNum}${Graph.exitCell.rowNum}${Graph.exitCell.colNum}`;
+    Q.push(root);
+    while(Q.length > 0){
+        const curr = Q.pop();
+        const coordinates = `${curr.levelNum}${curr.rowNum}${curr.colNum}`;
+        if(coordinates === goal){
+            return curr;
+        }
+        let neighbors = curr.getNeighbors(Graph.rows, Graph.cols);
+        for (const neighbor of neighbors) {
+            const coord = neighbor;
+            const neigh = Graph.maze[coord[0]][coord[1]][coord[2]]
+            if(neigh.visitedBySearcher === false){
+                neigh.visitedBySearcher = true;
+                Q.push(neigh)
+            }
+        }
+    }
+    return false;
+}
+
+function DFSSearch(Graph, root) { // G - generated maze, root - startCell
+    const S = [];
+    const goal = `${Graph.exitCell.levelNum}${Graph.exitCell.rowNum}${Graph.exitCell.colNum}`;
+    S.push(root);
+    while(S.length > 0){
+        const curr = S.pop();
+        const coordinates = `${curr.levelNum}${curr.rowNum}${curr.colNum}`;
+        if(!curr.visitedBySearcher){
+            curr.visitedBySearcher = true
+            let neighbors = curr.getNeighbors(Graph.rows, Graph.cols);
+            for (const neighbor of neighbors) {
+                const coord = neighbor;
+                const neigh = Graph.maze[coord[0]][coord[1]][coord[2]]
+                S.push(neigh);
+            }
+        }
+    }
+    if(Graph.maze[+Graph.exitCell.levelNum][+Graph.exitCell.rowNum][+Graph.exitCell.colNum].visitedBySearcher){
+        return true;
+    }
+    return false;
+}
+
+function AStarSearch(){
+
+}
+
+
+
+//----------------------------------------GENERATORS------------------------------------------------------------
+
+
+
+
 class Cell {
     constructor(levelNum = -1, rowNum = -1, colNum = -1) {
         this.levelNum = levelNum;
@@ -12,7 +77,47 @@ class Cell {
         this.isExit = false;
         this.isEntrance = false;
         this.visited = false;
+        this.visitedBySearcher = false;
     }
+
+    getNeighbors(rows, cols) {
+        const directions = [
+            [0, 0, 1], // right
+            [0, 0, -1], // left
+            [0, -1, 0], // top
+            [0, 1, 0], // bottom
+            [1, 0, 0], // up
+            [-1, 0, 0], // down
+        ]
+        const neighbors = new Set();
+        if(!this.rightPass){
+            directions[0] = [0,0,0];
+        }
+        if(!this.leftPass){
+            directions[1] = [0,0,0];
+        }
+        if(!this.topPass){
+            directions[2] = [0,0,0];
+        }
+        if(!this.bottomPass){
+            directions[3] = [0,0,0];
+        }
+        if(!this.upPass){
+            directions[4] = [0,0,0];
+        }
+        if(!this.downPass){
+            directions[5] = [0,0,0];
+        }
+        let [l, r, c] = [+this.levelNum, +this.rowNum, +this.colNum];
+        for (let i = 0; i < directions.length; i++) {
+            const [dirL, dirR, dirC] = directions[i];
+            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
+                neighbors.add(`${l + dirL}${r + dirR}${c + dirC}`)
+            }
+        }
+        return neighbors;
+    }
+
 }
 
 class Randomizer {
@@ -25,11 +130,25 @@ class Maze3D {
     #maze
     #entranceCell
     #exitCell
+    #levels
+    #rows
+    #cols
 
     constructor(maze, entranceCell, exitCell) {
         this.#maze = maze;
         this.#entranceCell = entranceCell;
         this.#exitCell = exitCell;
+        this.#levels = 3;
+        this.#rows = this.#maze[0].length;
+        this.#cols = this.#maze[0][0].length;
+    }
+
+    get rows() {
+        return this.#rows;
+    }
+
+    get cols() {
+        return this.#cols;
     }
 
     get maze() {
@@ -45,6 +164,9 @@ class Maze3D {
         return this.#exitCell;
     }
 
+    get levels() {
+        return this.#levels;
+    }
 
     toString() {
         for (let i = 0; i < this.#maze.length; i++) {
@@ -108,7 +230,7 @@ class Maze3dGenerator {
         }
     }
 
-    measureAlgorithmTime(obj, rows,cols){
+    measureAlgorithmTime(obj, rows, cols) {
         const startTime = Date.now();
         obj.generate(rows, cols);
         const endTime = Date.now();
@@ -156,29 +278,23 @@ class Maze3dGenerator {
                         entranceCell.isEntrance = true;
                         entranceCell.upPass = false;
                         entranceCell.downPass = false;
+                        k === 0 ? entranceCell.rightPass = true : entranceCell.leftPass = true;
                     }
                     if (i === randomLevelExt && j === randomRowExt && k === randomColExt) {
                         exitCell = cell;
                         exitCell.isExit = true;
                         exitCell.upPass = false;
                         exitCell.downPass = false;
+                        k === 0 ? exitCell.rightPass = true : exitCell.leftPass = true;
+
                     }
                 }
             }
         }
         return new Maze3D(maze, entranceCell, exitCell);
     }
-}
 
-class SimpleMaze3dGenerator extends Maze3dGenerator {
-    #maze
-
-    constructor() {
-        super();
-    }
-
-
-    #carveThePath() {
+    carveThePath(instance) {
         const visited = new Map();
         const directions = [
             [0, 0, 1], // right
@@ -188,9 +304,9 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
             [1, 0, 0], // up
             [-1, 0, 0], // down
         ];
-        const maze = this.#maze;
-        const rows = maze.maze[0].length;
-        const cols = maze.maze[0][0].length;
+        const maze = instance;
+        const rows = instance.rows;
+        const cols = instance.cols;
         let [entrL, entrR, entrC] = [maze.entranceCell.levelNum, maze.entranceCell.rowNum, maze.entranceCell.colNum]
         let [extL, extR, extC] = [maze.exitCell.levelNum, maze.exitCell.rowNum, maze.exitCell.colNum]
         let currCell = maze.entranceCell;
@@ -218,9 +334,95 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
             }
 
         }
-        return visited;
+        for (const [cellNum, pathDirection] of visited.entries()) {
+            let [l, r, c] = cellNum;
+            const cell = instance.maze[+l][+r][+c];
+            if (pathDirection[0]) {
+                pathDirection === 1 ? cell.upPass = true : cell.downPass = true;
+            }
+            if (pathDirection[1]) {
+                if (pathDirection[1] === -1) {
+                    cell.topPass = true;
+                    const nextCell = instance.maze[+l][+r - 1][+c];
+                    if (nextCell) {
+                        nextCell.bottomPass = true;
+                    }
+                } else {
+                    cell.bottomPass = true;
+                    const nextCell = instance.maze[+l][+r + 1][+c];
+                    if (nextCell) {
+                        nextCell.topPass = true;
+                    }
+
+                }
+            }
+            if (pathDirection[2]) {
+                if (pathDirection[2] === 1) {
+                    cell.rightPass = true;
+                    const nextCell = instance.maze[+l][+r][+c + 1];
+                    if (nextCell) {
+                        nextCell.leftPass = true;
+                    }
+
+                } else {
+                    cell.leftPass = true;
+                    const nextCell = instance.maze[+l][+r][+c - 1];
+                    if (nextCell) {
+                        nextCell.rightPass = true;
+                    }
+                }
+            }
+        }
     }
 
+    /**
+     * Method removes walls between two cells in the maze.
+     * @param {Cell} currCell
+     * @param {Cell} neighbor
+     */
+    removeWalls(currCell, neighbor) {
+        //compare cells on z axis
+        let i = currCell.levelNum - neighbor.levelNum;
+        if (i === 1) {
+            currCell.downPass = true;
+            neighbor.upPass = true;
+        } else if (i === -1) {
+            currCell.upPass = true;
+            neighbor.downPass = true;
+        }
+
+        //compare cells on y axis
+        let j = currCell.rowNum - neighbor.rowNum;
+        if (j === 1) {
+            currCell.topPass = true;
+            neighbor.bottomPass = true;
+        } else if (j === -1) {
+            currCell.bottomPass = true;
+            neighbor.topPass = true;
+        }
+
+        //compare cells on x axis
+        let k = currCell.colNum - neighbor.colNum;
+        if (k === 1) {
+            currCell.leftPass = true;
+            neighbor.rightPass = true;
+        } else if (k === -1) {
+            currCell.rightPass = true;
+            neighbor.leftPass = true;
+        }
+    }
+}
+
+class SimpleMaze3dGenerator extends Maze3dGenerator {
+    #maze
+
+    constructor() {
+        super();
+    }
+
+    #carveThePath(){
+        super.carveThePath(this.#maze);
+    }
 
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
@@ -255,51 +457,12 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
                     }
                 }
             }
-            const path = this.#carveThePath()
-            for (const [cellNum, pathDirection] of path.entries()) {
-                let [l, r, c] = cellNum;
-                const cell = this.#maze.maze[+l][+r][+c];
-                if (pathDirection[0]) {
-                    pathDirection === 1 ? cell.upPass = true : cell.downPass = true;
-                }
-                if (pathDirection[1]) {
-                    if (pathDirection[1] === -1) {
-                        cell.topPass = true;
-                        const nextCell = this.#maze.maze[+l][+r - 1][+c];
-                        if (nextCell) {
-                            nextCell.bottomPass = true;
-                        }
-                    } else {
-                        cell.bottomPass = true;
-                        const nextCell = this.#maze.maze[+l][+r + 1][+c];
-                        if (nextCell) {
-                            nextCell.topPass = true;
-                        }
-
-                    }
-                }
-                if (pathDirection[2]) {
-                    if (pathDirection[2] === 1) {
-                        cell.rightPass = true;
-                        const nextCell = this.#maze.maze[+l][+r][+c + 1];
-                        if (nextCell) {
-                            nextCell.leftPass = true;
-                        }
-
-                    } else {
-                        cell.leftPass = true;
-                        const nextCell = this.#maze.maze[+l][+r][+c - 1];
-                        if (nextCell) {
-                            nextCell.rightPass = true;
-                        }
-                    }
-                }
-            }
+            this.#carveThePath();
         }
         return this.#maze;
     }
 
-    measureAlgorithmTime(rows, cols){
+    measureAlgorithmTime(rows, cols) {
         return super.measureAlgorithmTime(this, rows, cols)
     }
 }
@@ -317,7 +480,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
      * @param {Number} rows
      * @param {Number} cols
      */
-    #getUnvisitedNeighbors(cell, rows, cols){
+    #getUnvisitedNeighbors(cell, rows, cols) {
         const directions = [
             [0, 0, 1], // right
             [0, 0, -1], // left
@@ -327,24 +490,64 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
             [-1, 0, 0], // down
         ]
         const neighbors = [];
-        let [l,r,c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
+        let [l, r, c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
         for (let i = 0; i < directions.length; i++) {
             const [dirL, dirR, dirC] = directions[i];
-            if((l+dirL < 3 && l+dirL >= 0) && (r+dirR < rows && r+dirR >= 0) && (c+dirC < cols && c+dirC >= 0)){
-                const neighborCell = this.#maze.maze[l+dirL][r+dirR][c+dirC];
-                if(neighborCell.visited === false){
-                    neighbors.push(`${l+dirL}${r+dirR}${c+dirC}`)
+            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
+                const neighborCell = this.#maze.maze[l + dirL][r + dirR][c + dirC];
+                if (neighborCell.visited === false) {
+                    neighbors.push(`${l + dirL}${r + dirR}${c + dirC}`)
                 }
             }
         }
         return neighbors;
     }
 
-    /**
-     * Method removes walls between two cells in the maze.
-     * @param {Cell} currCell
-     * @param {Cell} neighbor
-     */
+    #removeWalls(currCell, neighbor){
+        super.removeWalls(currCell, neighbor);
+    }
+    #carveThePath(){
+        super.carveThePath(this.#maze)
+    }
+    generate(rows, cols) {
+        this.#maze = super.generate(rows, cols);
+        const stack = [];
+        const visited = new Map();
+        let initCell = this.#maze.entranceCell;
+        visited.set(`${initCell.levelNum}${initCell.rowNum}${initCell.colNum}`, initCell);
+        stack.push(initCell);
+        let currCell = initCell;
+        while (stack.length > 0) {
+            const neighbors = this.#getUnvisitedNeighbors(currCell, rows, cols);
+            const randomNeighbor = neighbors[Randomizer.randomNumMinMax(0, neighbors.length - 1)]; // str of neighbor position [level][row][col]
+            if (neighbors.length > 0 && !visited.has(randomNeighbor)) {
+                const neighborCell = this.#maze.maze[+randomNeighbor[0]][+randomNeighbor[1]][+randomNeighbor[2]];
+                neighborCell.visited = true;
+                //remove the wall between cells//
+                this.#removeWalls(currCell, neighborCell);
+                visited.set(randomNeighbor, neighborCell);
+                stack.push(neighborCell);
+                currCell = neighborCell;
+            } else {
+                currCell = stack.pop();
+            }
+        }
+        this.#carveThePath()
+        return this.#maze;
+    }
+
+    measureAlgorithmTime(rows, cols) {
+        return super.measureAlgorithmTime(this, rows, cols)
+    }
+}
+
+class AldousBroderMaze3dGenerator extends Maze3dGenerator {
+    #maze
+
+    constructor() {
+        super();
+    }
+
     #removeWalls(currCell, neighbor) {
         //compare cells on z axis
         let i = currCell.levelNum - neighbor.levelNum;
@@ -377,41 +580,103 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         }
     }
 
-    generate(rows, cols) {
-        this.#maze = super.generate(rows, cols);
-        const stack = [];
-        const visited = new Map();
-        let initCell = this.#maze.entranceCell;
-        visited.set(`${initCell.levelNum}${initCell.rowNum}${initCell.colNum}`, initCell);
-        stack.push(initCell);
-        let currCell = initCell;
-        while (stack.length > 0) {
-            const neighbors = this.#getUnvisitedNeighbors(currCell, rows, cols);
-            const randomNeighbor = neighbors[Randomizer.randomNumMinMax(0, neighbors.length - 1)]; // str of neighbor position [level][row][col]
-            if (neighbors.length > 0 && !visited.has(randomNeighbor)) {
-                const neighborCell = this.#maze.maze[+randomNeighbor[0]][+randomNeighbor[1]][+randomNeighbor[2]];
-                neighborCell.visited = true;
-                //remove the wall between cells//
-                this.#removeWalls(currCell, neighborCell);
-                visited.set(randomNeighbor, neighborCell);
-                stack.push(neighborCell);
-                currCell = neighborCell;
-
-            } else {
-                currCell = stack.pop();
+    #getUnvisitedNeighbors(cell, rows, cols) {
+        const directions = [
+            [0, 0, 1], // right
+            [0, 0, -1], // left
+            [0, -1, 0], // top
+            [0, 1, 0], // bottom
+            [1, 0, 0], // up
+            [-1, 0, 0], // down
+        ]
+        const neighbors = [];
+        let [l, r, c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
+        for (let i = 0; i < directions.length; i++) {
+            const [dirL, dirR, dirC] = directions[i];
+            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
+                const neighborCell = this.#maze.maze[l + dirL][r + dirR][c + dirC];
+                if (neighborCell.visited === false) {
+                    neighbors.push(`${l + dirL}${r + dirR}${c + dirC}`)
+                }
             }
         }
-        return this.#maze;
+        return neighbors;
     }
 
-    measureAlgorithmTime(rows, cols){
-        return super.measureAlgorithmTime(this, rows, cols)
+    generate(rows, cols) {
+        let flag = true;
+        this.#maze = super.generate(rows, cols);
+        const randomLevel = Randomizer.randomNumMinMax(0, this.#maze.levels - 1);
+        const randomRow = Randomizer.randomNumMinMax(0, rows - 1);
+        const randomCol = Randomizer.randomNumMinMax(0, cols - 1);
+        let currCell = this.#maze.maze[randomLevel][randomRow][randomCol];
+
+        while (flag) {
+            let n = 0;
+            const neighbors = this.#getUnvisitedNeighbors(currCell, rows, cols);
+            if(neighbors.length === 0){
+                // for (let i = 0; i < this.#maze.levels; i++) {
+                //     for (let j = 0; j < rows; j++) {
+                //         for (let k = 0; k < cols; k++) {
+                //             if (this.#maze.maze[i][j][k].visited === false) {
+                //                 // currCell = this.#maze.maze[i][j][k];
+                //                 // currCell.visited = true;
+                //                 this.#maze.maze[i][j][k].visited = true
+                //                 console.log(this.#maze.maze[i][j][k])
+                //             }
+                //         }
+                //
+                //     }
+                // }
+                for (let i = 0; i < this.#maze.levels; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        for (let k = 0; k < cols; k++) {
+                            if (this.#maze.maze[i][j][k].visited === false) {
+                                n++;
+                            }
+                        }
+
+                    }
+
+                }
+                n > 0 ? flag = true : flag = false;
+                continue
+            }
+            const randomIdx = Randomizer.randomNumMinMax(0, neighbors.length - 1);
+            const [randNL, randNR, randNC] = neighbors[randomIdx];
+            const randomNeighborCell = this.#maze.maze[+randNL][+randNR][+randNC];
+            currCell.visited = true;
+            // randomNeighborCell.visited = true;
+            currCell = randomNeighborCell;
+            this.#removeWalls(currCell, randomNeighborCell);
+            for (let i = 0; i < this.#maze.levels; i++) {
+                for (let j = 0; j < rows; j++) {
+                    for (let k = 0; k < cols; k++) {
+                        if (this.#maze.maze[i][j][k].visited === false) {
+                            n++;
+                        }
+                    }
+
+                }
+
+            }
+            n > 0 ? flag = true : flag = false;
+            console.log(n)
+        }
+
+        return this.#maze
     }
+
+
 }
 
-const mazeGen = new SimpleMaze3dGenerator()
-const mazeGenDFS = new DFSMaze3dGenerator()
-const maze = mazeGen.generate(4, 4);
-// console.log(mazeGen.measureAlgorithmTime(2000,2000))
-// console.log(mazeGenDFS.measureAlgorithmTime(2000,2000))
+// const mazeGen = new SimpleMaze3dGenerator()
+const mazeGen = new DFSMaze3dGenerator()
+// const mazeGenAB = new AldousBroderMaze3dGenerator();
+// const maze = mazeGen.generate(4, 4);
+const maze = mazeGen.generate(6, 6);
+// console.log(mazeGen.measureAlgorithmTime(40,40))
+// console.log(mazeGenDFS.measureAlgorithmTime(40,40))
 maze.toString()
+console.log(BFSSearch(maze, maze.entranceCell))
+console.log(DFSSearch(maze, maze.entranceCell))
