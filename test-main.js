@@ -220,6 +220,7 @@ function AStarSearch(graph, start, goal, heuristic) { // graph -> maze, start - 
 
 //----------------------------------------GENERATORS------------------------------------------------------------
 class Cell {
+
     constructor(levelNum = -1, rowNum = -1, colNum = -1) {
         this.levelNum = levelNum;
         this.rowNum = rowNum;
@@ -474,6 +475,27 @@ class Maze3dGenerator {
         return new Maze3D(maze, entranceCell, exitCell);
     }
 
+    getAllNeighbors(instance, cell) {
+        const rows = instance.rows;
+        const cols = instance.cols;
+        const directions = [
+            [0, 0, 1], // right
+            [0, 0, -1], // left
+            [0, -1, 0], // top
+            [0, 1, 0], // bottom
+            [1, 0, 0], // up
+            [-1, 0, 0], // down
+        ]
+        const neighbors = [];
+        let [l, r, c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
+        for (let i = 0; i < directions.length; i++) {
+            const [dirL, dirR, dirC] = directions[i];
+            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
+                neighbors.push(`${l + dirL},${r + dirR},${c + dirC}`);
+            }
+        }
+        return neighbors;
+    }
     carveThePath(instance) {
         const visited = new Map();
         const directions = [
@@ -661,30 +683,17 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
     /**
      * Method gets unvisited neighbors of the cell.
      * @param {Cell} cell
-     * @param {Number} rows
-     * @param {Number} cols
      */
-    #getUnvisitedNeighbors(cell, rows, cols) {
-        const directions = [
-            [0, 0, 1], // right
-            [0, 0, -1], // left
-            [0, -1, 0], // top
-            [0, 1, 0], // bottom
-            [1, 0, 0], // up
-            [-1, 0, 0], // down
-        ]
-        const neighbors = [];
-        let [l, r, c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
-        for (let i = 0; i < directions.length; i++) {
-            const [dirL, dirR, dirC] = directions[i];
-            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
-                const neighborCell = this.#maze.maze[l + dirL][r + dirR][c + dirC];
-                if (neighborCell.visited === false) {
-                    neighbors.push(`${l + dirL},${r + dirR},${c + dirC}`)
-                }
+    #getUnvisitedNeighbors(cell) {
+        const allNeighbors = super.getAllNeighbors(this.#maze, cell);
+        const unvisitedNeighbors = [];
+        for (let i = 0; i < allNeighbors.length; i++) {
+            const neighborCell = this.#maze.getNodeByCoordinates(allNeighbors[i]);
+            if (neighborCell.visited === false) {
+                unvisitedNeighbors.push(allNeighbors[i])
             }
         }
-        return neighbors;
+        return unvisitedNeighbors;
     }
 
     #removeWalls(currCell, neighbor) {
@@ -700,7 +709,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         stack.push(initCell);
         let currCell = initCell;
         while (stack.length > 0) {
-            const neighbors = this.#getUnvisitedNeighbors(currCell, rows, cols);
+            const neighbors = this.#getUnvisitedNeighbors(currCell);
             let randomNeighbor = neighbors[Randomizer.randomNumMinMax(0, neighbors.length - 1)]; // str of neighbor position [level][row][col]
             if (randomNeighbor) {
                 randomNeighbor = randomNeighbor.split(',');
@@ -737,24 +746,8 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
         super.removeWalls(currCell, neighbor)
     }
 
-    #getAllNeighbors(cell, rows, cols) {
-        const directions = [
-            [0, 0, 1], // right
-            [0, 0, -1], // left
-            [0, -1, 0], // top
-            [0, 1, 0], // bottom
-            [1, 0, 0], // up
-            [-1, 0, 0], // down
-        ]
-        const neighbors = [];
-        let [l, r, c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
-        for (let i = 0; i < directions.length; i++) {
-            const [dirL, dirR, dirC] = directions[i];
-            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
-                neighbors.push(`${l + dirL},${r + dirR},${c + dirC}`);
-            }
-        }
-        return neighbors;
+    #getAllNeighbors(cell) {
+        return super.getAllNeighbors(this.#maze, cell)
     }
 
     generate(rows, cols) {
@@ -766,15 +759,15 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
             for (let j = 0; j < rows; j++) {
                 for (let k = 0; k < cols; k++) {
                     if (!this.#maze.maze[i][j][k].visited) {
-                        visited.add(`${i},${j},${k}`)
+                        visited.add(`${i},${j},${k}`);
                     }
                 }
             }
         }
         while (visited.size > 0) {
-            const neighborsCoordinatesList = this.#getAllNeighbors(currCell, rows, cols)
+            const neighborsCoordinatesList = this.#getAllNeighbors(currCell)
             const randInt = Randomizer.randomNumMinMax(0, neighborsCoordinatesList.length - 1);
-            const strOfCoordinates = neighborsCoordinatesList[randInt]
+            const strOfCoordinates = neighborsCoordinatesList[randInt];
             const randomNeighbor = this.#maze.getNodeByCoordinates(strOfCoordinates);
             if (!randomNeighbor.visited) {
                 randomNeighbor.visited = true;
@@ -783,7 +776,7 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
             }
             currCell = randomNeighbor;
         }
-        return this.#maze
+        return this.#maze;
     }
 
 
