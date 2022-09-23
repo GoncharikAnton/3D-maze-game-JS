@@ -99,3 +99,17 @@ class PriorityQueue {
     }    
   }
 }
+
+const pq = new PriorityQueue((node1, node2) => node1[1] < node2[1]);
+pq.push(['qweqwe', 1])
+pq.push(['qwe2', 2])
+pq.push(['qw0', 0])
+pq.push(['qw5', 5])
+let a = pq.pop()
+console.log(a)
+a = pq.pop()
+console.log(a)
+a = pq.pop()
+console.log(a)
+a = pq.pop()
+console.log(a)
