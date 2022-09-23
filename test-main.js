@@ -219,6 +219,9 @@ function AStarSearch(graph, start, goal, heuristic) { // graph -> maze, start - 
 }
 
 //----------------------------------------GENERATORS------------------------------------------------------------
+/**
+ * Class represents an instance of the cell(node).
+ */
 class Cell {
 
     constructor(levelNum = -1, rowNum = -1, colNum = -1) {
@@ -237,10 +240,20 @@ class Cell {
         this.visitedBySearcher = false;
     }
 
+    /**
+     * Method returns coordinates of the position of the cell in the graph(maze).
+     * @returns {string}
+     */
     get coordinates() {
         return `${this.levelNum},${this.rowNum},${this.colNum}`
     }
 
+    /**
+     * Method returns only neighbors, for which the cell(node) has access by its properties.
+     * @param rows
+     * @param cols
+     * @returns {Set<any>}
+     */
     getValidNeighbors(rows, cols) {
         const directions = [
             [0, 0, 1], // right
@@ -281,9 +294,12 @@ class Cell {
 
 }
 
+/**
+ * Class created just for convenience. It provides static methods to return random numbers.
+ */
 class Randomizer {
     static randomNumMinMax(min, max) {
-        return Math.floor(Math.random() * (max + 1 - min) + min)
+        return Math.floor(Math.random() * (max + 1 - min) + min);
     }
 
     static randomCoordinates(levels, rows, cols) {
@@ -305,11 +321,11 @@ class Maze3D {
     #rows
     #cols
 
-    constructor(maze, entranceCell, exitCell) {
+    constructor(maze, levels = 3, entranceCell, exitCell) {
         this.#maze = maze;
         this.#entranceCell = entranceCell;
         this.#exitCell = exitCell;
-        this.#levels = 3;
+        this.#levels = levels;
         this.#rows = this.#maze[0].length;
         this.#cols = this.#maze[0][0].length;
     }
@@ -339,12 +355,12 @@ class Maze3D {
     }
 
     getNodeByCoordinates(str) {
-        let coordinates = str.split(',')
+        let coordinates = str.split(',');
         return this.#maze[+coordinates[0]][+coordinates[1]][+coordinates[2]];
     }
 
     getNeighborsOfTheNode(coordinates) {
-        const [i, j, k] = coordinates.split(',')
+        const [i, j, k] = coordinates.split(',');
         return this.#maze[i][j][k].getValidNeighbors(this.rows, this.cols);
     }
 
@@ -418,6 +434,13 @@ class Maze3dGenerator {
         return `Time of execution of generator - ${endTime - startTime}ms`
     }
 
+    /**
+     * Method generates blueprint(instance) of maze, where all nodes have walls(each node has all pass properties as false).
+     * Also, method randomly generates 2 points (start , end) which can't be on the same level of the maze.
+     * @param {Number}rows
+     * @param {Number}cols
+     * @returns {Maze3D}
+     */
     generate(rows, cols) {
         let maze = [];
         maze.length = 3;
@@ -475,6 +498,12 @@ class Maze3dGenerator {
         return new Maze3D(maze, entranceCell, exitCell);
     }
 
+    /**
+     * Method returns ALL possible neighbors of the passed cell(node).
+     * @param {Maze3D} instance
+     * @param {Cell} cell
+     * @returns {Array} neighbors
+     */
     getAllNeighbors(instance, cell) {
         const rows = instance.rows;
         const cols = instance.cols;
@@ -490,12 +519,18 @@ class Maze3dGenerator {
         let [l, r, c] = [+cell.levelNum, +cell.rowNum, +cell.colNum];
         for (let i = 0; i < directions.length; i++) {
             const [dirL, dirR, dirC] = directions[i];
-            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
+            if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) &&
+                (c + dirC < cols && c + dirC >= 0)) {
                 neighbors.push(`${l + dirL},${r + dirR},${c + dirC}`);
             }
         }
         return neighbors;
     }
+
+    /**
+     * Method randomly builds a path from node1 to node2 (which provided by a maze instance) and changes a wall(direction)
+     * properties of the all selected nodes on the path (i.e. removes walls between cells on the path).
+     */
     carveThePath(instance) {
         const visited = new Map();
         const directions = [
@@ -509,17 +544,18 @@ class Maze3dGenerator {
         const maze = instance;
         const rows = instance.rows;
         const cols = instance.cols;
-        let [entrL, entrR, entrC] = [maze.entranceCell.levelNum, maze.entranceCell.rowNum, maze.entranceCell.colNum]
-        let [extL, extR, extC] = [maze.exitCell.levelNum, maze.exitCell.rowNum, maze.exitCell.colNum]
+        let [entrL, entrR, entrC] = [maze.entranceCell.levelNum, maze.entranceCell.rowNum, maze.entranceCell.colNum];
+        let [extL, extR, extC] = [maze.exitCell.levelNum, maze.exitCell.rowNum, maze.exitCell.colNum];
         let currCell = maze.entranceCell;
         visited.set(`${entrL},${entrR},${entrC}`, currCell);
         while (!visited.has(`${extL},${extR},${extC}`)) {
             const randomChoice = Randomizer.randomNumMinMax(0, 5);
             const [l, r, c] = directions[randomChoice];
             if (l === 0 && r === 0 && c === 0) {
-                continue
+                continue;
             } else {
-                if ((entrL + l >= 0 && entrL + l <= 2) && (entrR + r >= 0 && entrR + r <= rows - 1) && (entrC + c >= 0 && entrC + c <= cols - 1)) {
+                if ((entrL + l >= 0 && entrL + l <= 2) && (entrR + r >= 0 && entrR + r <= rows - 1) &&
+                    (entrC + c >= 0 && entrC + c <= cols - 1)) {
                     if (entrL + l === extL) {
                         directions[4] = [0, 0, 0];
                         directions[5] = [0, 0, 0];
@@ -536,11 +572,9 @@ class Maze3dGenerator {
             }
 
         }
-        // console.log(visited)
-        // console.log(instance.entranceCell)
-        // console.log(instance.exitCell)
+
         for (const [cellNum, pathDirection] of visited.entries()) {
-            let cellNumList = cellNum.split(',')
+            let cellNumList = cellNum.split(',');
             let [l, r, c] = cellNumList;
             const cell = instance.maze[+l][+r][+c];
             if (pathDirection[0]) {
@@ -582,7 +616,7 @@ class Maze3dGenerator {
     }
 
     /**
-     * Method removes walls between two cells in the maze.
+     * Method changes properties of walls(directions) between two neighbor cells in the maze from false to true.
      * @param {Cell} currCell
      * @param {Cell} neighbor
      */
@@ -622,14 +656,13 @@ class Maze3dGenerator {
 class SimpleMaze3dGenerator extends Maze3dGenerator {
     #maze
 
-    constructor() {
-        super();
-    }
-
-    #carveThePath() {
-        super.carveThePath(this.#maze);
-    }
-
+    /**
+     * Generates a random maze instance without any algorithm. All fields(properties) of the cells(nodes) builds
+     * randomly with a simple random number generator.
+     * @param {Number} rows
+     * @param {Number} cols
+     * @returns {Maze3D} New maze instance.
+     */
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
 
@@ -668,6 +701,14 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
         return this.#maze;
     }
 
+    /**
+     * Calls a method from parent class, that randomly builds a path from node1 to node2 and changes a wall(direction)
+     * properties of the all selected nodes on the path (i.e. removes walls between cells on the path).
+     */
+    #carveThePath() {
+        super.carveThePath(this.#maze);
+    }
+
     measureAlgorithmTime(rows, cols) {
         return super.measureAlgorithmTime(this, rows, cols)
     }
@@ -675,10 +716,6 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
 
 class DFSMaze3dGenerator extends Maze3dGenerator {
     #maze
-
-    constructor() {
-        super();
-    }
 
     /**
      * Method gets unvisited neighbors of the cell.
@@ -690,7 +727,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         for (let i = 0; i < allNeighbors.length; i++) {
             const neighborCell = this.#maze.getNodeByCoordinates(allNeighbors[i]);
             if (neighborCell.visited === false) {
-                unvisitedNeighbors.push(allNeighbors[i])
+                unvisitedNeighbors.push(allNeighbors[i]);
             }
         }
         return unvisitedNeighbors;
@@ -700,6 +737,12 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         super.removeWalls(currCell, neighbor);
     }
 
+    /**
+     * Generate a random maze instance with a DFS algorithm.
+     * @param {Number} rows
+     * @param {Number} cols
+     * @returns {Maze3D} New maze instance.
+     */
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
         const stack = [];
@@ -726,30 +769,42 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
                 currCell = stack.pop();
             }
         }
-        // this.#carveThePath();
         return this.#maze;
     }
 
     measureAlgorithmTime(rows, cols) {
-        return super.measureAlgorithmTime(this, rows, cols)
+        return super.measureAlgorithmTime(this, rows, cols);
     }
 }
 
 class AldousBroderMaze3dGenerator extends Maze3dGenerator {
     #maze
 
-    constructor() {
-        super();
-    }
-
+    /**
+     * Method calls super method from parent class that changes properties of walls(directions) of 2 cells.
+     * (Removes walls between 2 cells).
+     * @param {Cell} currCell
+     * @param {Cell} neighbor
+     */
     #removeWalls(currCell, neighbor) {
         super.removeWalls(currCell, neighbor)
     }
 
+    /**
+     * Method calls super method from parent class that returns all neighbor nodes of the passed node.
+     * @param cell
+     * @returns {*[]}
+     */
     #getAllNeighbors(cell) {
         return super.getAllNeighbors(this.#maze, cell)
     }
 
+    /**
+     * Generates a random maze instance with an Aldous-Broder algorithm.
+     * @param {Number} rows
+     * @param {Number} cols
+     * @returns {Maze3D} New maze instance.
+     */
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
         let currCell = this.#maze.entranceCell;
