@@ -1,14 +1,148 @@
-//----------------------------------------SEARCH ALGORITHMS------------------------------------------------------------
-class Searchable {
-    constructor() {
-        if (this.constructor === Searchable) {
-            throw new Error('Searchable is an abstract class.')
+//----------------------------------------PRIORITY QUEUE------------------------------------------------------------
+class PriorityQueue {
+    #heap
+    #comparator
+    #top
+
+    constructor(comparator = (a, b) => a > b) {
+        this.#heap = [];
+        this.#comparator = comparator;
+        this.#top = 0;
+    }
+
+    size() {
+        return this.#heap.length;
+    }
+
+    isEmpty() {
+        return this.size() == 0;
+    }
+
+    peek() {
+        return this.#heap[this.#top];
+    }
+
+    push(...values) {
+        values.forEach(value => {
+            this.#heap.push(value);
+            this.#heapifyUp(this.size() - 1);
+        });
+        return this.size();
+    }
+
+    pop() {
+        const poppedValue = this.peek();
+        const bottom = this.size() - 1;
+        if (bottom > this.#top) {
+            this.#swap(this.#top, bottom);
+        }
+        this.#heap.pop();
+        this.#heapifyDown();
+        return poppedValue;
+    }
+
+    remove(value) {
+        const index = this.#heap.indexOf(value);
+        if (index != -1) {
+            this.#removeAt(index);
+        }
+    }
+
+    #parent(childIndex) {
+        return Math.floor((childIndex - 1) / 2);
+    }
+
+    #left(parentIndex) {
+        return (parentIndex * 2) + 1;
+    }
+
+    #right(parentIndex) {
+        return (parentIndex * 2) + 2;
+    }
+
+    #greater(i, j) {
+        return this.#comparator(this.#heap[i], this.#heap[j]);
+    }
+
+    #swap(i, j) {
+        [this.#heap[i], this.#heap[j]] = [this.#heap[j], this.#heap[i]];
+    }
+
+    #heapifyUp(index) {
+        while (index > this.#top && this.#greater(index, this.#parent(index))) {
+            this.#swap(index, this.#parent(index));
+            index = this.#parent(index);
+        }
+    }
+
+    #heapifyDown() {
+        let index = this.#top;
+
+        while (
+            (this.#left(index) < this.size() && this.#greater(this.#left(index), index)) ||
+            (this.#right(index) < this.size() && this.#greater(this.#right(index), index))
+            ) {
+            let maxChild = (this.#right(index) < this.size() && this.#greater(this.#right(index), this.#left(index))) ?
+                this.#right(index) : this.#left(index);
+            this.#swap(index, maxChild);
+            index = maxChild;
+        }
+    }
+
+    #removeAt(index) {
+        // Remove the last element and place it at the removed index
+        this.#heap[index] = this.#heap.pop();
+
+        if (index > this.#top && this.#greater(index, this.#parent(index))) {
+            this.#heapifyUp(index);
+        } else {
+            this.#heapifyDown(index);
         }
     }
 }
 
+//----------------------------------------SEARCH ALGORITHMS------------------------------------------------------------
+//----------------------------------------BLUEPRINTS------------------------------------------------------------
+// class Searchable{
+//     get startState() {}
+//     get goalState() {}
+//     getStateTransitions(state) {}
+// }
+// class SearchAlgorithm{
+//     search(searchable) {}
+//     getNumberOfNodesEvaluated() {}
+// }
+// class State{
+//     #key
+//
+//     constructor(key) {
+//         if (this.constructor === State) {
+//             throw new Error('State cannot be initialized');
+//         }
+//         this.#key = key;
+//     }
+//     get key() {
+//         return this.#key;
+//     }
+//     equals(other) {
+//         return other instanceof State && this.#key === other.#key;
+//     }
+// }
+// class MazeState extends State{
+//     #maze
+//     constructor(maze) {
+//         super(maze.toString());
+//         this.#maze = maze;
+//     }
+//     get maze() {
+//         return this.#maze;
+//     }
+// }
+//----------------------------------------BLUEPRINTS------------------------------------------------------------
+
 function BFSSearch(Graph, root) { // G - generated maze, root - startCell
     const Q = [];
+    // goal comes with a state
     const goal = `${Graph.exitCell.levelNum},${Graph.exitCell.rowNum},${Graph.exitCell.colNum}`;
     Q.push(root);
     while (Q.length > 0) {
@@ -51,10 +185,9 @@ function DFSSearch(Graph, root) { // G - generated maze, root - startCell
     return false;
 }
 
-function AStarSearch() {
+function AStarSearch(start, goal, heuristic) {
 
 }
-
 //----------------------------------------GENERATORS------------------------------------------------------------
 class Cell {
     constructor(levelNum = -1, rowNum = -1, colNum = -1) {
@@ -538,7 +671,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         while (stack.length > 0) {
             const neighbors = this.#getUnvisitedNeighbors(currCell, rows, cols);
             let randomNeighbor = neighbors[Randomizer.randomNumMinMax(0, neighbors.length - 1)]; // str of neighbor position [level][row][col]
-            if(randomNeighbor){
+            if (randomNeighbor) {
                 randomNeighbor = randomNeighbor.split(',');
             }
             if (neighbors.length > 0 && !visited.has(randomNeighbor)) {
@@ -553,7 +686,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
                 currCell = stack.pop();
             }
         }
-        this.#carveThePath()
+        // this.#carveThePath()
         return this.#maze;
     }
 
@@ -595,9 +728,11 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
         }
         return neighbors;
     }
-    #carveThePath(){
+
+    #carveThePath() {
         return super.carveThePath(this.#maze)
     }
+
     generate(rows, cols) {
         let flag = true;
         this.#maze = super.generate(rows, cols);
@@ -627,7 +762,7 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
             currCell = randomNeighbor;
             flag = false
         }
-        this.#carveThePath()
+        // this.#carveThePath()
         return this.#maze
     }
 
@@ -635,11 +770,11 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
 }
 
 // const mazeGen = new SimpleMaze3dGenerator()
-const mazeGen = new DFSMaze3dGenerator()
+// const mazeGen = new DFSMaze3dGenerator()
 // const mazeGen = new AldousBroderMaze3dGenerator();
 const maze = mazeGen.generate(20, 20);
 // console.log(mazeGen.measureAlgorithmTime(40,40))
 // console.log(mazeGenDFS.measureAlgorithmTime(40,40))
 maze.toString()
-// console.log(BFSSearch(maze, maze.entranceCell))
-// console.log(DFSSearch(maze, maze.entranceCell))
+console.log(BFSSearch(maze, maze.entranceCell))
+console.log(DFSSearch(maze, maze.entranceCell))
