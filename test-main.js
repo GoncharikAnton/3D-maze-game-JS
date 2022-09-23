@@ -15,7 +15,7 @@ class PriorityQueue {
     }
 
     isEmpty() {
-        return this.size() == 0;
+        return this.size() === 0;
     }
 
     peek() {
@@ -43,7 +43,7 @@ class PriorityQueue {
 
     remove(value) {
         const index = this.#heap.indexOf(value);
-        if (index != -1) {
+        if (index !== -1) {
             this.#removeAt(index);
         }
     }
@@ -151,7 +151,7 @@ function BFSSearch(Graph, root) { // G - generated maze, root - startCell
         if (coordinates === goal) {
             return currCell;
         }
-        let neighbors = currCell.getNeighbors(Graph.rows, Graph.cols);
+        let neighbors = currCell.getValidNeighbors(Graph.rows, Graph.cols);
         for (const neighbor of neighbors) {
             const coord = neighbor.split(',');
             const neigh = Graph.maze[coord[0]][coord[1]][coord[2]]
@@ -164,30 +164,60 @@ function BFSSearch(Graph, root) { // G - generated maze, root - startCell
     return false;
 }
 
-function DFSSearch(Graph, root) { // G - generated maze, root - startCell
-    const S = [];
-    S.push(root);
-    while (S.length > 0) {
-        const currCell = S.pop();
-        if (!currCell.visitedBySearcher) {
-            currCell.visitedBySearcher = true
-            let neighbors = currCell.getNeighbors(Graph.rows, Graph.cols);
-            for (const neighbor of neighbors) {
-                const coord = neighbor.split(',');
-                const neigh = Graph.maze[+coord[0]][+coord[1]][+coord[2]]
-                S.push(neigh);
+function DFSSearch(graph, start, goal) { // G - generated maze, start - str, end - str;
+    const node = graph.getNodeByCoordinates(start);
+    const stack = [];
+    stack.push(node);
+    while (stack.length > 0) {
+        const currNode = stack.pop();
+        if (!currNode.visitedBySearcher) {
+            currNode.visitedBySearcher = true;
+            let neighbors = graph.getNeighborsOfTheNode(currNode.coordinates);
+            for (const neighborCoordinates of neighbors) {
+                const neighborNode = graph.getNodeByCoordinates(neighborCoordinates);
+                stack.push(neighborNode);
             }
         }
     }
-    if (Graph.maze[+Graph.exitCell.levelNum][+Graph.exitCell.rowNum][+Graph.exitCell.colNum].visitedBySearcher) {
+    if (graph.getNodeByCoordinates(goal).visitedBySearcher) {
         return true;
     }
     return false;
 }
 
-function AStarSearch(start, goal, heuristic) {
-
+function heuristic(a, b) {
+    const [z1, y1, x1] = a.split(',');
+    const [z2, y2, x2] = b.split(',');
+    return Math.abs(z1 - z2) + Math.abs(y1 - y2) + Math.abs(x1 - x2)
 }
+
+function AStarSearch(graph, start, goal, heuristic) { // graph -> maze, start - `index of the cell(str)`, goal - `index of the cell(str)`, heuristic -> function
+    const frontier = new PriorityQueue((cell1, cell2) => cell1[1] < cell2[1]);
+    frontier.push([start, 0]);
+    const cameFrom = new Map();
+    const costSoFar = new Map();
+    cameFrom.set(start, null);
+    costSoFar.set(start, 0);
+
+    while (!frontier.isEmpty()) {
+        let [currentLocation, priority] = frontier.pop();
+        if (currentLocation === goal) {
+            break;
+        }
+        const neighbors = graph.getNeighborsOfTheNode(currentLocation);
+        for (const next of neighbors) {
+            const newCost = costSoFar.get(currentLocation) + 1;
+            if (!costSoFar.has(next) || newCost < costSoFar.get(next)) {
+                costSoFar.set(next, newCost);
+                priority = newCost + heuristic(next, goal);
+                frontier.push([next, priority]);
+                cameFrom.set(next, currentLocation)
+            }
+        }
+    }
+    return [cameFrom, costSoFar]
+}
+
 //----------------------------------------GENERATORS------------------------------------------------------------
 class Cell {
     constructor(levelNum = -1, rowNum = -1, colNum = -1) {
@@ -207,10 +237,10 @@ class Cell {
     }
 
     get coordinates() {
-        return `${this.levelNum}${this.rowNum}${this.colNum}`
+        return `${this.levelNum},${this.rowNum},${this.colNum}`
     }
 
-    getNeighbors(rows, cols) {
+    getValidNeighbors(rows, cols) {
         const directions = [
             [0, 0, 1], // right
             [0, 0, -1], // left
@@ -295,7 +325,6 @@ class Maze3D {
         return this.#maze;
     }
 
-
     get entranceCell() {
         return this.#entranceCell;
     }
@@ -308,9 +337,14 @@ class Maze3D {
         return this.#levels;
     }
 
-    getCellByCoordinates(str) {
+    getNodeByCoordinates(str) {
         let coordinates = str.split(',')
         return this.#maze[+coordinates[0]][+coordinates[1]][+coordinates[2]];
+    }
+
+    getNeighborsOfTheNode(coordinates) {
+        const [i, j, k] = coordinates.split(',')
+        return this.#maze[i][j][k].getValidNeighbors(this.rows, this.cols);
     }
 
     toString() {
@@ -369,6 +403,7 @@ class Maze3D {
 }
 
 class Maze3dGenerator {
+
     constructor() {
         if (this.constructor === Maze3dGenerator) {
             throw new Error('This is an abstract class.');
@@ -479,9 +514,9 @@ class Maze3dGenerator {
             }
 
         }
-        console.log(visited)
-        console.log(instance.entranceCell)
-        console.log(instance.exitCell)
+        // console.log(visited)
+        // console.log(instance.entranceCell)
+        // console.log(instance.exitCell)
         for (const [cellNum, pathDirection] of visited.entries()) {
             let cellNumList = cellNum.split(',')
             let [l, r, c] = cellNumList;
@@ -656,10 +691,6 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         super.removeWalls(currCell, neighbor);
     }
 
-    #carveThePath() {
-        super.carveThePath(this.#maze)
-    }
-
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
         const stack = [];
@@ -686,7 +717,7 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
                 currCell = stack.pop();
             }
         }
-        // this.#carveThePath()
+        // this.#carveThePath();
         return this.#maze;
     }
 
@@ -706,7 +737,7 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
         super.removeWalls(currCell, neighbor)
     }
 
-    #getNeighbors(cell, rows, cols) {
+    #getAllNeighbors(cell, rows, cols) {
         const directions = [
             [0, 0, 1], // right
             [0, 0, -1], // left
@@ -720,21 +751,13 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
         for (let i = 0; i < directions.length; i++) {
             const [dirL, dirR, dirC] = directions[i];
             if ((l + dirL < 3 && l + dirL >= 0) && (r + dirR < rows && r + dirR >= 0) && (c + dirC < cols && c + dirC >= 0)) {
-                // const neighborCell = this.#maze.maze[l + dirL][r + dirR][c + dirC];
-                // if (neighborCell.visited === false) {
-                neighbors.push(`${l + dirL},${r + dirR},${c + dirC}`)
-                // }
+                neighbors.push(`${l + dirL},${r + dirR},${c + dirC}`);
             }
         }
         return neighbors;
     }
 
-    #carveThePath() {
-        return super.carveThePath(this.#maze)
-    }
-
     generate(rows, cols) {
-        let flag = true;
         this.#maze = super.generate(rows, cols);
         let currCell = this.#maze.entranceCell;
         const visited = new Set();
@@ -749,20 +772,17 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
             }
         }
         while (visited.size > 0) {
-            const neighborsCoordinatesList = this.#getNeighbors(currCell, rows, cols)
-
+            const neighborsCoordinatesList = this.#getAllNeighbors(currCell, rows, cols)
             const randInt = Randomizer.randomNumMinMax(0, neighborsCoordinatesList.length - 1);
             const strOfCoordinates = neighborsCoordinatesList[randInt]
-            const randomNeighbor = this.#maze.getCellByCoordinates(strOfCoordinates);
+            const randomNeighbor = this.#maze.getNodeByCoordinates(strOfCoordinates);
             if (!randomNeighbor.visited) {
                 randomNeighbor.visited = true;
                 this.#removeWalls(currCell, randomNeighbor);
                 visited.delete(strOfCoordinates);
             }
             currCell = randomNeighbor;
-            flag = false
         }
-        // this.#carveThePath()
         return this.#maze
     }
 
@@ -770,11 +790,12 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
 }
 
 // const mazeGen = new SimpleMaze3dGenerator()
-// const mazeGen = new DFSMaze3dGenerator()
+const mazeGen = new DFSMaze3dGenerator()
 // const mazeGen = new AldousBroderMaze3dGenerator();
-const maze = mazeGen.generate(20, 20);
+const maze = mazeGen.generate(3, 4);
 // console.log(mazeGen.measureAlgorithmTime(40,40))
 // console.log(mazeGenDFS.measureAlgorithmTime(40,40))
 maze.toString()
-console.log(BFSSearch(maze, maze.entranceCell))
-console.log(DFSSearch(maze, maze.entranceCell))
+// console.log(BFSSearch(maze, maze.entranceCell))
+// console.log(DFSSearch(maze, maze.entranceCell.coordinates, maze.exitCell.coordinates))
+// console.log(AStarSearch(maze, maze.entranceCell.coordinates, maze.exitCell.coordinates, heuristic))
