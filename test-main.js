@@ -140,24 +140,22 @@ class PriorityQueue {
 // }
 //----------------------------------------BLUEPRINTS------------------------------------------------------------
 
-function BFSSearch(Graph, root) { // G - generated maze, root - startCell
-    const Q = [];
-    // goal comes with a state
-    const goal = `${Graph.exitCell.levelNum},${Graph.exitCell.rowNum},${Graph.exitCell.colNum}`;
-    Q.push(root);
-    while (Q.length > 0) {
-        const currCell = Q.pop();
-        const coordinates = `${currCell.levelNum},${currCell.rowNum},${currCell.colNum}`;
+function BFSSearch(graph, start, goal) { // G - generated maze, start str, goal str
+    const queue = [];
+    const startNode = graph.getNodeByCoordinates(start);
+    queue.push(startNode);
+    while (queue.length > 0) {
+        const currCell = queue.pop();
+        const coordinates = currCell.coordinates;
         if (coordinates === goal) {
             return currCell;
         }
-        let neighbors = currCell.getValidNeighbors(Graph.rows, Graph.cols);
-        for (const neighbor of neighbors) {
-            const coord = neighbor.split(',');
-            const neigh = Graph.maze[coord[0]][coord[1]][coord[2]]
+        let neighbors = currCell.getValidNeighbors(graph.rows, graph.cols);
+        for (const neighborCoordinates of neighbors) {
+            const neigh = graph.getNodeByCoordinates(neighborCoordinates);
             if (neigh.visitedBySearcher === false) {
                 neigh.visitedBySearcher = true;
-                Q.push(neigh)
+                queue.push(neigh)
             }
         }
     }
@@ -321,11 +319,11 @@ class Maze3D {
     #rows
     #cols
 
-    constructor(maze, levels = 3, entranceCell, exitCell) {
+    constructor(maze, entranceCell, exitCell) {
         this.#maze = maze;
         this.#entranceCell = entranceCell;
         this.#exitCell = exitCell;
-        this.#levels = levels;
+        this.#levels = 3;
         this.#rows = this.#maze[0].length;
         this.#cols = this.#maze[0][0].length;
     }
@@ -490,7 +488,6 @@ class Maze3dGenerator {
                         exitCell.upPass = false;
                         exitCell.downPass = false;
                         k === 0 ? exitCell.rightPass = true : exitCell.leftPass = true;
-
                     }
                 }
             }
@@ -844,6 +841,6 @@ const maze = mazeGen.generate(3, 4);
 // console.log(mazeGen.measureAlgorithmTime(40,40))
 // console.log(mazeGenDFS.measureAlgorithmTime(40,40))
 maze.toString()
-// console.log(BFSSearch(maze, maze.entranceCell))
+// console.log(BFSSearch(maze,  maze.entranceCell.coordinates, maze.exitCell.coordinates))
 // console.log(DFSSearch(maze, maze.entranceCell.coordinates, maze.exitCell.coordinates))
 // console.log(AStarSearch(maze, maze.entranceCell.coordinates, maze.exitCell.coordinates, heuristic))
