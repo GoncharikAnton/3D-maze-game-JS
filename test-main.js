@@ -102,67 +102,226 @@ class PriorityQueue {
 }
 
 //----------------------------------------SEARCH ALGORITHMS------------------------------------------------------------
-//----------------------------------------BLUEPRINTS------------------------------------------------------------
-// class Searchable{
-//     get startState() {}
-//     get goalState() {}
-//     getStateTransitions(state) {}
-// }
-// class SearchAlgorithm{
-//     search(searchable) {}
-//     getNumberOfNodesEvaluated() {}
-// }
-// class State{
-//     #key
-//
-//     constructor(key) {
-//         if (this.constructor === State) {
-//             throw new Error('State cannot be initialized');
-//         }
-//         this.#key = key;
-//     }
-//     get key() {
-//         return this.#key;
-//     }
-//     equals(other) {
-//         return other instanceof State && this.#key === other.#key;
-//     }
-// }
-// class MazeState extends State{
-//     #maze
-//     constructor(maze) {
-//         super(maze.toString());
-//         this.#maze = maze;
-//     }
-//     get maze() {
-//         return this.#maze;
-//     }
-// }
-//----------------------------------------BLUEPRINTS------------------------------------------------------------
+class SearchAlgorithm{
+    search(searchable) {}
+    getNumberOfNodesEvaluated() {}
+}
+class BFS extends SearchAlgorithm{
+    #numberOfNodesEvaluated
+    constructor() {
+        super();
+        this.#numberOfNodesEvaluated = false;
+    }
+    search(searchable){
+        const goal = searchable.goalState; // str
+        const queue = [];
+        const visited = new Set();
+        const initNode = searchable.initNode // node object // initial-state
+        queue.push(initNode);
+        while (queue.length > 0) {
+            const currNode = queue.pop();
+            const coordinates = currNode.toString(); // string representation of node
+            if (coordinates === goal) {
+                return this.#numberOfNodesEvaluated = visited.size;  // node
+            }
+            let neighbors = searchable.getNeighbors(currNode); // neighbors of the node represented by strings
+            for (const neighborCoordinates of neighbors) {
+                if(!visited.has(neighborCoordinates)){
+                    visited.add(neighborCoordinates);
+                    queue.unshift(neighborCoordinates);
+                }
+            }
+        }
+        return this.#numberOfNodesEvaluated = false;
+    }
+
+    getNumberOfNodesEvaluated() {
+        return this.#numberOfNodesEvaluated
+    }
+
+}
+class DFS extends SearchAlgorithm{
+    #numberOfNodesEvaluated
+    constructor() {
+        super();
+        this.#numberOfNodesEvaluated = false;
+    }
+
+    search(searchable){
+        const initNode = searchable.initNode;
+        const stack = [];
+        const visited = new Set();
+        stack.push(initNode);
+        while (stack.length > 0) {
+            const currNode = stack.pop();
+            if (!visited.has(currNode.toString())) {
+                visited.add(currNode.toString());
+                let neighbors = searchable.getNeighbors(currNode);
+                for (const neighborCoordinates of neighbors) {
+                    const neighborNode = searchable.getNode(neighborCoordinates);
+                    stack.push(neighborNode);
+                }
+            }
+        }
+        if (visited.has(searchable.goalState)) {
+            return this.#numberOfNodesEvaluated = true;
+        }
+        return this.#numberOfNodesEvaluated = false;
+    }
+
+    getNumberOfNodesEvaluated() {
+        return this.#numberOfNodesEvaluated;
+    }
+}
+class AStar extends SearchAlgorithm{
+    #numberOfNodesEvaluated
+    constructor() {
+        super();
+        this.#numberOfNodesEvaluated = false;
+    }
+
+    search(searchable) {
+        const start = searchable.startState;
+        const goal = searchable.goalState;
+        const frontier = new PriorityQueue((node1, node2) => node1[1] < node2[1]);
+        frontier.push([start, 0]);
+        const cameFrom = new Map();
+        const costSoFar = new Map();
+        cameFrom.set(start, null);
+        costSoFar.set(start, 0);
+
+        while (!frontier.isEmpty()) {
+            let [currentLocation, priority] = frontier.pop();
+            if (currentLocation === goal) {
+                break;
+            }
+            const neighbors = searchable.getNeighbors(currentLocation);
+            for (const next of neighbors) {
+                const newCost = costSoFar.get(currentLocation) + 1;
+                if (!costSoFar.has(next) || newCost < costSoFar.get(next)) {
+                    costSoFar.set(next, newCost);
+                    priority = newCost + heuristic(next, goal);
+                    frontier.push([next, priority]);
+                    cameFrom.set(next, currentLocation)
+                }
+            }
+        }
+        return this.#numberOfNodesEvaluated = [cameFrom, costSoFar]
+    }
+
+    getNumberOfNodesEvaluated() {
+        return this.#numberOfNodesEvaluated;
+    }
+}
+
+class Searchable{
+    constructor() {
+        if(this.constructor === Searchable){
+            throw new Error('This is an abstract class');
+        }
+    }
+    get startState() {}
+    get goalState() {}
+    getNeighbors(state) {}
+}
+class MazeDomain extends Searchable{
+    #state
+    constructor(state) {
+        super(state);
+        this.#state = state;
+    }
+    get startState() {
+        return this.#state.start;
+    }
+    get goalState() {
+        return this.#state.goal;
+    }
+    get initNode(){
+        return this.#state.initNode;
+    }
+    getNode(nodeStr){
+        return this.#state.getNode(nodeStr);
+    }
+    getNeighbors(node){ // valid actions
+        if(node instanceof String){
+            return this.#state.validNeighbors(this.getNode(node));
+        }else{
+            return this.#state.validNeighbors(node);
+        }
+    }
+}
+class State{
+    #key
+
+    constructor(key) {
+        if (this.constructor === State) {
+            throw new Error('State cannot be initialized');
+        }
+        this.#key = key;
+    }
+    get key() {
+        return this.#key;
+    }
+    equals(other) {
+        return other instanceof State && this.#key === other.#key;
+    }
+}
+class MazeState extends State{
+    #maze
+    constructor(maze) {
+        super(maze.toString());
+        this.#maze = maze;
+    }
+    get maze() {
+        return this.#maze;
+    }
+    get start(){
+        return this.#maze.entranceCell.coordinates;
+    }
+    get goal(){
+        return this.#maze.exitCell.coordinates;
+    }
+    get initNode(){
+        return this.#maze.getNodeByCoordinates(this.start)
+    }
+    getNode(coordinates){
+        return this.#maze.getNodeByCoordinates(coordinates)
+    }
+    validNeighbors(node){
+        return this.#maze.getNeighborsOfTheNode(node.toString())
+    }
+
+}
+
 
 function BFSSearch(graph, start, goal) { // G - generated maze, start str, goal str
     const queue = [];
-    const startNode = graph.getNodeByCoordinates(start);
+    const visited = new Set();
+    const startNode = graph.getNodeByCoordinates(start); // node object // initial-state
     queue.push(startNode);
     while (queue.length > 0) {
         const currCell = queue.pop();
-        const coordinates = currCell.coordinates;
+        const coordinates = currCell.coordinates; // string representation of node
         if (coordinates === goal) {
-            return currCell;
+            return currCell;  // node
         }
-        let neighbors = currCell.getValidNeighbors(graph.rows, graph.cols);
+        let neighbors = currCell.getValidNeighbors(graph.rows, graph.cols); // neighbors of the node
         for (const neighborCoordinates of neighbors) {
-            const neigh = graph.getNodeByCoordinates(neighborCoordinates);
-            if (neigh.visitedBySearcher === false) {
-                neigh.visitedBySearcher = true;
-                queue.push(neigh)
+            const neigh = graph.getNodeByCoordinates(neighborCoordinates); // object that gotten from board by coordinates
+            // if (neigh.visitedBySearcher === false) { // flag which indicates that node was visited
+            //     neigh.visitedBySearcher = true;
+            //     queue.unshift(neigh)
+            // }
+            if(!visited.has(neigh.coordinates)){
+                visited.add(neigh.coordinates);
+                queue.unshift(neigh);
             }
         }
     }
     return false;
 }
 
-function DFSSearch(graph, start, goal) { // G - generated maze, start - str, end - str;
+function DFSSearch(graph, start, goal) { // graph - generated maze, start - str, end - str;
     const node = graph.getNodeByCoordinates(start);
     const stack = [];
     stack.push(node);
@@ -242,6 +401,12 @@ class Cell {
      * Method returns coordinates of the position of the cell in the graph(maze).
      * @returns {string}
      */
+
+
+    toString(){
+        return `${this.levelNum},${this.rowNum},${this.colNum}`
+    }
+
     get coordinates() {
         return `${this.levelNum},${this.rowNum},${this.colNum}`
     }
@@ -837,10 +1002,20 @@ class AldousBroderMaze3dGenerator extends Maze3dGenerator {
 // const mazeGen = new SimpleMaze3dGenerator()
 const mazeGen = new DFSMaze3dGenerator()
 // const mazeGen = new AldousBroderMaze3dGenerator();
-const maze = mazeGen.generate(3, 4);
+const maze = mazeGen.generate(4, 4);
 // console.log(mazeGen.measureAlgorithmTime(40,40))
 // console.log(mazeGenDFS.measureAlgorithmTime(40,40))
-maze.toString()
+// maze.toString()
 // console.log(BFSSearch(maze,  maze.entranceCell.coordinates, maze.exitCell.coordinates))
 // console.log(DFSSearch(maze, maze.entranceCell.coordinates, maze.exitCell.coordinates))
 // console.log(AStarSearch(maze, maze.entranceCell.coordinates, maze.exitCell.coordinates, heuristic))
+const mazeState = new MazeState(maze)
+const searchable = new MazeDomain(mazeState);
+
+function testSearchAlgorithm(searchAlgo, searchable) {
+    const solution = searchAlgo.search(searchable);
+    const numOfNodes = searchAlgo.getNumberOfNodesEvaluated();
+    console.log(numOfNodes)
+}
+const qwe = new AStar();
+testSearchAlgorithm(qwe, searchable)
