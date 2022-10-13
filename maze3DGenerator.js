@@ -64,10 +64,14 @@ class Maze3dGenerator {
                         entranceCell = cell;
                         entranceCell.isEntrance = true;
                         entranceCell.player = true;
+                        // entranceCell.upPass = true;
+                        // entranceCell.downPass = true;
                     }
                     if (i === randomLevelExt && j === randomRowExt && k === randomColExt) {
                         exitCell = cell;
                         exitCell.isExit = true;
+                        // exitCell.upPass = true;
+                        // exitCell.downPass = true;
                     }
                 }
             }
@@ -188,6 +192,9 @@ class Maze3dGenerator {
                         nextCell.rightPass = true;
                     }
                 }
+            }
+            if(+cell.levelNum === 0){
+                cell.downPass = false;
             }
         }
     }

@@ -13,34 +13,16 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
      */
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
-        // TODO change removeWall !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         for (let i = 0; i < this.#maze.maze.length; i++) {
             for (let j = 0; j < rows; j++) {
                 for (let k = 0; k < cols; k++) {
                     const cell = this.#maze.maze[i][j][k];
-                    cell.topPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                    cell.bottomPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                    if (j === 0) {
-                        cell.topPass = false;
-                    } else if (j === rows - 1) {
-                        cell.bottomPass = false;
-                    }
-                    cell.leftPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                    cell.rightPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                    if (k === 0) {
-                        cell.leftPass = false;
-                    } else if (k === rows - 1) {
-                        cell.rightPass = false;
-                    }
-                    if (!cell.isExit && !cell.isEntrance) {
-                        if (i === 0) {
-                            cell.upPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                        } else if (i === 1) {
-                            cell.upPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                            cell.downPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                        } else {
-                            cell.downPass = Boolean(Randomizer.randomNumMinMax(0, 1));
-                        }
+                    const allNeighbors = this.#getAllNeighbors(this.#maze, cell);
+                    const randomNeighborNum = Randomizer.randomNumMinMax(0, allNeighbors.length-1);
+                    const neighborCell = this.#maze.getNodeByCoordinates(allNeighbors[+randomNeighborNum]);
+                    this.#removeWalls(cell, neighborCell);
+                    if(i === 0){
+                        cell.downPass = false;
                     }
                 }
             }
@@ -55,6 +37,14 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
      */
     #carveThePath() {
         super.carveThePath(this.#maze);
+    }
+
+    #getAllNeighbors(instance, cell) {
+        return super.getAllNeighbors(instance, cell);
+    }
+
+    #removeWalls(currCell, neighbor) {
+        super.removeWalls(currCell, neighbor);
     }
 
     measureAlgorithmTime(rows, cols) {

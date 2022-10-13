@@ -1,5 +1,6 @@
 import SearchAlgorithm from "./searchAlgoAbstract.js";
 import PriorityQueue from "../priorityQueue.js";
+import Graph from "../forAStar/graph.js";
 
 class AStar extends SearchAlgorithm{
     #numberOfNodesEvaluated
@@ -10,7 +11,7 @@ class AStar extends SearchAlgorithm{
     heuristic(a, b) {
         const [z1, y1, x1] = a.split(',');
         const [z2, y2, x2] = b.split(',');
-        return Math.abs(z1 - z2) + Math.abs(y1 - y2) + Math.abs(x1 - x2)
+        return Math.abs(z1 - z2) + Math.abs(y1 - y2) + Math.abs(x1 - x2);
     }
     search(searchable) {
         const start = searchable.startState;
@@ -21,7 +22,7 @@ class AStar extends SearchAlgorithm{
         const costSoFar = new Map();
         cameFrom.set(start, null);
         costSoFar.set(start, 0);
-
+        const toD = []
         while (!frontier.isEmpty()) {
             let [currentLocation, priority] = frontier.pop();
             if (currentLocation === goal) {
@@ -34,16 +35,38 @@ class AStar extends SearchAlgorithm{
                     costSoFar.set(next, newCost);
                     priority = newCost + this.heuristic(next, goal);
                     frontier.push([next, priority]);
-                    cameFrom.set(next, currentLocation)
+                    cameFrom.set(currentLocation, next)
+                    toD.push([currentLocation, next, newCost])
                 }
             }
         }
-        return this.#numberOfNodesEvaluated = [cameFrom, costSoFar]
+
+        const graph = new Graph();
+        const allCells = new Set();
+        const edgesWithWeight = toD;
+        for (let i = 0; i < toD.length; i++) {
+            allCells.add(toD[i][0]);
+            allCells.add(toD[i][1]);
+        }
+        for (const cell of allCells) {
+            graph.addNode(cell)
+        }
+        for (const edge of edgesWithWeight) {
+            graph.addEdge(edge[0], edge[1], edge[2]);
+        }
+
+        const path = graph.findShortestRoute(searchable.startState, searchable.goalState)
+        this.#numberOfNodesEvaluated = path.length;
+        return path;
     }
 
     getNumberOfNodesEvaluated() {
         return this.#numberOfNodesEvaluated;
     }
+
+
+
+
 }
 
 

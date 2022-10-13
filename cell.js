@@ -50,6 +50,7 @@ class Cell {
             [-1, 0, 0], // down
         ]
         const neighbors = new Set();
+
         if (!this.rightPass) {
             directions[0] = [0, 0, 0];
         }

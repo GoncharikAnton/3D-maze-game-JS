@@ -6,6 +6,7 @@ import AldousBroderMaze3dGenerator from "./generators/aldousBroderMaze3dGenerato
 import Player from "./player.js"
 import {mazeView, reRenderPlayerLocation} from "./maze-view.js";
 import BFS from "./searchAlgorithms/bfs.js";
+import DFS from "./searchAlgorithms/dfs.js";
 
 const nameInp = document.querySelector('#user-name-inp');
 const rowInp = document.querySelector('#rows-inp');
@@ -17,6 +18,8 @@ const mazeContainer = document.querySelector('#maze-container');
 const mazeLevelHeader = document.querySelector('#level-header');
 const resetBtn =  document.querySelector('#reset-game-btn');
 const form = document.querySelector('form');
+
+
 // const mazeGen = new DFSMaze3dGenerator();
 let mazeGen, maze, mazeState, searchable, algo, player, rowInpValue, colInpValue;
 
@@ -28,15 +31,13 @@ form.addEventListener('submit', e => {
         rowInpValue = Number(rowInp.value);
         colInpValue = Number(colInp.value);
 
-        mazeGen = new AldousBroderMaze3dGenerator();
+        // mazeGen = new AldousBroderMaze3dGenerator();
+        // mazeGen = new SimpleMaze3dGenerator();
+        mazeGen = new DFSMaze3dGenerator();
         maze = mazeGen.generate(rowInpValue, colInpValue); // rowInp, colInp int
 
-        mazeState = new MazeState(maze)
-        searchable = new MazeDomain(mazeState);
-        algo = new AStar();
         player = new Player(maze.entranceCell.levelNum, maze.entranceCell.rowNum, maze.entranceCell.colNum);
-        testSearchAlgorithm(algo, searchable);
-        mazeView(mazeState.maze, player, rowInpValue, colInpValue) // rowInp, colInp int
+        mazeView(maze, player, rowInpValue, colInpValue);
     } else {
 
     }
@@ -85,6 +86,27 @@ resetBtn.addEventListener('click', e => {
     }
 
 })
+solveGameBtn.addEventListener('click', e => {
+    mazeState = new MazeState(maze)
+    searchable = new MazeDomain(mazeState);
+    algo = new AStar(); // to make it dynamic
+    const search = testSearchAlgorithm(algo, searchable);
+    const solution = Array.from(search[0]);
+    const numOfNodes = search[1];
+    console.log(solution)
+    let moveCount = 0;
+    let prevLocation = player.coordinates;
+    const interval = setInterval(() => {
+        let nextLocation;
+        nextLocation = solution[moveCount]
+        changePlayerLocation(prevLocation, nextLocation)
+        prevLocation = nextLocation;
+        moveCount++;
+        if (moveCount === numOfNodes) {
+            clearInterval(interval);
+        }
+    }, 700);
+})
 
 
 function changePlayerLocation(prevLocation, nextLocation) {
@@ -109,5 +131,5 @@ function changePlayerLocation(prevLocation, nextLocation) {
 function testSearchAlgorithm(searchAlgo, searchable) {
     const solution = searchAlgo.search(searchable);
     const numOfNodes = searchAlgo.getNumberOfNodesEvaluated();
-    console.log(solution)
+    return [solution, numOfNodes];
 }

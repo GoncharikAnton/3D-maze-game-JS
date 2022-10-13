@@ -22,11 +22,12 @@ class DFS extends SearchAlgorithm{
                     stack.push(neighborNode);
                 }
             }
+            if (visited.has(searchable.goalState)) {
+                this.#numberOfNodesEvaluated = visited.size;
+                return visited;
+            }
         }
-        if (visited.has(searchable.goalState)) {
-            return this.#numberOfNodesEvaluated = true;
-        }
-        return this.#numberOfNodesEvaluated = false;
+        return false
     }
 
     getNumberOfNodesEvaluated() {

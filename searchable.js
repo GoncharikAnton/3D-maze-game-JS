@@ -17,7 +17,7 @@ export class State{
 export class MazeState extends State{
     #maze
     constructor(maze) {
-        super(maze.toString());
+        super(maze);
         this.#maze = maze;
     }
     get maze() {

@@ -17,7 +17,8 @@ class BFS extends SearchAlgorithm{
             const coordinates = currNode.toString(); // string representation of node
             if (coordinates === goal) {
                 // return this.#numberOfNodesEvaluated = visited.size;  // node
-                return this.#numberOfNodesEvaluated = visited;  // node
+                this.#numberOfNodesEvaluated = visited.size;
+                return visited;
             }
             let neighbors = searchable.getNeighbors(currNode); // neighbors of the node represented by strings
             for (const neighborCoordinates of neighbors) {
@@ -27,7 +28,7 @@ class BFS extends SearchAlgorithm{
                 }
             }
         }
-        return this.#numberOfNodesEvaluated = false;
+        return visited;
     }
 
     getNumberOfNodesEvaluated() {
