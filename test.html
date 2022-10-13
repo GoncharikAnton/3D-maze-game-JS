@@ -6,8 +6,58 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <script type="module" src="test-main.js" defer></script>
+<!--    <script type="module" src="test-main.js" defer></script>-->
+<!--    <script type="module" src="maze-view.js" defer></script>-->
+    <script type="module" src="maze-controller.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!--<div class="container"></div>-->
+<div id="root">
+    <section id="form-section">
+        <form action="#">
+            <div class="input-div">
+                <label for="user-name-inp">Name</label>
+                <input type="text" id="user-name-inp" required pattern="^[A-Za-z]+$">
+            </div>
+            <div class="input-div">
+                <label for="rows-inp">Rows</label>
+                <input type="number" id="rows-inp" required value="5">
+            </div>
+            <div class="input-div">
+                <label for="cols-inp">Cols</label>
+                <input type="number" id="cols-inp" required value="5">
+            </div>
+            <div class="input-div">
+                <button id="start-new-game-btn">Start New Game</button>
+            </div>
+        </form>
+
+        <div class="input-div">
+            <label for="search-algo">Search Algorithm</label>
+            <select name="searchAlgo" id="search-algo">
+                <option value="bfs" selected>BFS</option>
+                <option value="dfs">DFS</option>
+                <option value="astar">AStar</option>
+            </select>
+
+
+        </div>
+        <div class="input-div">
+            <button id="solve-game-btn">Solve Game</button>
+        </div>
+        <div class="input-div">
+            <button id="reset-game-btn">Reset Game</button>
+        </div>
+
+    </section>
+    <section id="maze-section">
+        <h2 id="level-header"></h2>
+        <div id="maze-container">
+        </div>
+    </section>
+</div>
+
+
 </body>
 </html>

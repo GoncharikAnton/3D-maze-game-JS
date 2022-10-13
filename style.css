@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#root {
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+}
+
+#maze-container {
+    min-width: 50px;
+    min-height: 50px;
+    border: 2px solid black;
+    display: flex;
+    flex-wrap: wrap;
+
+}
+#level-header{
+    flex-basis: 100%;
+    height: 30px;
+}
+#form-section {
+    margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    width: 250px;
+}
+
+#maze-section {
+    margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 3;
+}
+
+input {
+    flex-basis: 100%;
+}
+
+label {
+    display: inline-block;
+    min-width: 40px;
+    text-align: right;
+}
+.input-div{
+    margin: 10px;
+    width: 100%;
+}
+.cell{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 25px;
+}
+#player{
+    width: 10px;
+    height: 20px;
+}

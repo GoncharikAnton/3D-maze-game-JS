@@ -63,16 +63,11 @@ class Maze3dGenerator {
                     if (i === randomLevelEntr && j === randomRowEntr && k === randomColEntr) {
                         entranceCell = cell;
                         entranceCell.isEntrance = true;
-                        entranceCell.upPass = false;
-                        entranceCell.downPass = false;
-                        k === 0 ? entranceCell.rightPass = true : entranceCell.leftPass = true;
+                        entranceCell.player = true;
                     }
                     if (i === randomLevelExt && j === randomRowExt && k === randomColExt) {
                         exitCell = cell;
                         exitCell.isExit = true;
-                        exitCell.upPass = false;
-                        exitCell.downPass = false;
-                        k === 0 ? exitCell.rightPass = true : exitCell.leftPass = true;
                     }
                 }
             }

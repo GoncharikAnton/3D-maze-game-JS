@@ -17,6 +17,7 @@ class Cell {
         this.isEntrance = false;
         this.visited = false;
         this.visitedBySearcher = false;
+        this.player = false;
     }
 
     /**

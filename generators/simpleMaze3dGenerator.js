@@ -13,7 +13,7 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
      */
     generate(rows, cols) {
         this.#maze = super.generate(rows, cols);
-
+        // TODO change removeWall !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         for (let i = 0; i < this.#maze.maze.length; i++) {
             for (let j = 0; j < rows; j++) {
                 for (let k = 0; k < cols; k++) {
