@@ -1,12 +1,16 @@
 import SearchAlgorithm from "./searchAlgoAbstract.js";
 import PriorityQueue from "../priorityQueue.js";
-import Graph from "../forAStar/graph.js";
+import Graph from "./forAStar/graph.js";
 
 class AStar extends SearchAlgorithm{
     #numberOfNodesEvaluated
-    constructor() {
+    #position
+    constructor(position = false) {
         super();
         this.#numberOfNodesEvaluated = false;
+        if(position){
+            this.#position = position
+        }
     }
     heuristic(a, b) {
         const [z1, y1, x1] = a.split(',');
@@ -14,7 +18,12 @@ class AStar extends SearchAlgorithm{
         return Math.abs(z1 - z2) + Math.abs(y1 - y2) + Math.abs(x1 - x2);
     }
     search(searchable) {
-        const start = searchable.startState;
+        let start;
+        if(this.#position){
+            start = this.#position
+        }else{
+            start = searchable.startState;
+        }
         const goal = searchable.goalState;
         const frontier = new PriorityQueue((node1, node2) => node1[1] < node2[1]);
         frontier.push([start, 0]);
@@ -55,7 +64,7 @@ class AStar extends SearchAlgorithm{
             graph.addEdge(edge[0], edge[1], edge[2]);
         }
 
-        const path = graph.findShortestRoute(searchable.startState, searchable.goalState)
+        const path = graph.findShortestRoute(start, goal)
         this.#numberOfNodesEvaluated = path.length;
         return path;
     }

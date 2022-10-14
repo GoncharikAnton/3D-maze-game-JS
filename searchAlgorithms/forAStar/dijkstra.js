@@ -1,4 +1,4 @@
-import PriorityQueue from "../priorityQueue.js";
+import PriorityQueue from "../../priorityQueue.js";
 
 /**
  *

@@ -7,6 +7,21 @@ export class State{
         }
         this.#key = key;
     }
+    get start(){
+        throw new Error(`You have to implement the method start!`);
+    }
+    get goal(){
+        throw new Error('You have to implement the method goal!');
+    }
+    get initNode(){
+        throw new Error('You have to implement the method initNode!');
+    }
+    getNode(coordinates){
+        throw new Error('You have to implement the method getNode!');
+    }
+    validNeighbors(node){
+        throw new Error('You have to implement the method validNeighbors!');
+    }
     get key() {
         return this.#key;
     }
@@ -14,6 +29,23 @@ export class State{
         return other instanceof State && this.#key === other.#key;
     }
 }
+export class Searchable{
+    constructor() {
+        if(this.constructor === Searchable){
+            throw new Error('This is an abstract class');
+        }
+    }
+    get startState() {
+        throw new Error('You have to implement startState!');
+    }
+    get goalState() {
+        throw new Error('You have to implement goalState!');
+    }
+    getNeighbors(state) {
+        throw new Error('You have to implement the method getNeighbors!');
+    }
+}
+
 export class MazeState extends State{
     #maze
     constructor(maze) {
@@ -39,16 +71,6 @@ export class MazeState extends State{
         return this.#maze.getNeighborsOfTheNode(node.toString())
     }
 
-}
-export class Searchable{
-    constructor() {
-        if(this.constructor === Searchable){
-            throw new Error('This is an abstract class');
-        }
-    }
-    get startState() {}
-    get goalState() {}
-    getNeighbors(state) {}
 }
 export class MazeDomain extends Searchable{
     #state
