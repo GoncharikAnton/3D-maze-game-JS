@@ -8,6 +8,9 @@ import MazeView from "./mazeView.js";
 import BFS from "./searchAlgorithms/bfs.js";
 import DFS from "./searchAlgorithms/dfs.js";
 import Directions from "./directions.js";
+import Maze3D from "./maze3d.js";
+import Maze3DGenerator from "./maze3DGenerator.js";
+import Cell from "./cell.js";
 
 class MazeController{
     #maze
@@ -17,8 +20,24 @@ class MazeController{
     #searchable
     #algo
     #directions
-    constructor() {
+    constructor(maze = false, player = false) {
         this.#directions = new Directions();
+        if(maze && player){
+            this.#maze = maze;
+            Object.setPrototypeOf(this.#maze, Maze3D.prototype)
+            for (let i = 0; i < this.#maze.maze.length; i++) {
+                for (let j = 0; j < this.#maze.maze[0].length; j++) {
+                    for (let k = 0; k < this.#maze.maze[0][0].length; k++) {
+                        Object.setPrototypeOf(this.#maze.maze[i][j][k], Cell.prototype);
+                        Object.setPrototypeOf(this.#maze.entranceCell, Cell.prototype);
+                        Object.setPrototypeOf(this.#maze.exitCell, Cell.prototype);
+
+                    }
+                }
+            }
+            this.#player = player;
+            Object.setPrototypeOf(this.#player, Player.prototype)
+        }
     }
 
     get view() {
@@ -51,9 +70,8 @@ class MazeController{
 
 
 
-    createMaze(rowInp, colInp){
+    createMaze(rowInp , colInp , db = false){
         // Temporary solution
-        const db = false;
         if (!db) {
             const rowInpValue = Number(rowInp);
             const colInpValue = Number(colInp);
@@ -62,12 +80,20 @@ class MazeController{
             const mazeGen = new DFSMaze3dGenerator();
             this.#maze = mazeGen.generate(rowInpValue, colInpValue); // rowInp, colInp int
             this.#player = new Player(this.maze.entranceCell.levelNum, this.maze.entranceCell.rowNum, this.maze.entranceCell.colNum);
-            this.#view = new MazeView(this.maze, this.#player)
+            this.#view = new MazeView(this.maze, this.player)
             this.#mazeState = new MazeState(this.maze);
             this.#searchable = new MazeDomain(this.mazeState);
             this.view.mazeView(rowInpValue, colInpValue);
         } else {
-
+            this.#maze.entranceCell;
+            const rowInpValue = this.maze.rows;
+            const colInpValue = this.maze.cols;
+            this.#maze = this.maze;
+            this.#player = this.player;
+            this.#view = new MazeView(this.maze, this.player)
+            this.#mazeState = new MazeState(this.maze);
+            this.#searchable = new MazeDomain(this.mazeState);
+            this.view.mazeView(rowInpValue, colInpValue);
         }
     }
 
@@ -111,9 +137,9 @@ class MazeController{
         }
     }
 
-    solveTheGame(){
-        // this.#algo = new AStar(); // to make it dynamic
-        this.#algo = new DFS(); // to make it dynamic
+    solveTheGame(algorithm = 'bfs'){
+        this.#algo = new AStar(); // to make it dynamic
+        // this.#algo = new DFS(); // to make it dynamic
         const search = this.testSearchAlgorithm(this.algo, this.searchable);
         const solution = Array.from(search[0]);
         const numOfNodes = search[1];
@@ -131,11 +157,13 @@ class MazeController{
         }, 700);
     }
     nextBestMove(){
-        const algo = new AStar(this.player.coordinates); // to make it dynamic
-        const search = this.testSearchAlgorithm(algo, this.searchable);
-        if(search){
-            const solution = Array.from(search[0]);
-            this.view.renderNextMove(solution[1])
+        if(this.player.coordinates !== this.maze.exitCell.coordinates){
+            const algo = new AStar(this.player.coordinates); // to make it dynamic
+            const search = this.testSearchAlgorithm(algo, this.searchable);
+            if(search){
+                const solution = Array.from(search[0]);
+                this.view.renderNextMove(solution[1])
+            }
         }
         }
 

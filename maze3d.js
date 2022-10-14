@@ -41,13 +41,26 @@ class Maze3D {
 
     getNodeByCoordinates(str) {
         let coordinates = str.split(',');
-        return this.#maze[+coordinates[0]][+coordinates[1]][+coordinates[2]];
+        return this.maze[+coordinates[0]][+coordinates[1]][+coordinates[2]];
     }
 
     getNeighborsOfTheNode(coordinates) {
         const [i, j, k] = coordinates.split(',');
-        return this.#maze[i][j][k].getValidNeighbors(this.rows, this.cols);
+        return this.maze[i][j][k].getValidNeighbors(this.rows, this.cols);
     }
+
+    toJSON(){
+        return {
+            maze: this.#maze,
+            entranceCell: this.#entranceCell,
+            exitCell: this.#exitCell,
+            levels: this.#levels,
+            rows: this.#rows,
+            cols: this.#cols,
+            getNodeByCoordinates: this.getNodeByCoordinates,
+            getNeighborsOfTheNode: this.getNeighborsOfTheNode
+        }
+        }
 
     toString() {
         for (let i = 0; i < this.#maze.length; i++) {

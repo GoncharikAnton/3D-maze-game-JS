@@ -31,23 +31,40 @@
         </form>
 
         <div class="input-div">
+            <button id="save-the-game">Save current game</button>
+        </div>
+
+
+        <div class="input-div">
             <label for="search-algo">Search Algorithm</label>
             <select name="searchAlgo" id="search-algo">
                 <option value="bfs" selected>BFS</option>
                 <option value="dfs">DFS</option>
                 <option value="astar">AStar</option>
             </select>
-
-
         </div>
         <div class="input-div">
             <button id="solve-game-btn">Solve Game</button>
         </div>
+
         <div class="input-div">
             <button id="reset-game-btn">Reset Game</button>
         </div>
+
         <div class="input-div">
             <button id="show-next-move-btn">Show the best next move</button>
+        </div>
+
+
+
+
+
+        <label for="last-game-name-inp">Name of the last game</label>
+        <div class="input-div">
+            <input type="text" id="last-game-name-inp">
+        </div>
+        <div class="input-div">
+            <button id="load-the-game">Load game</button>
         </div>
 
     </section>

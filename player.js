@@ -34,6 +34,15 @@ class Player{
     get coordinates(){
         return `${this.currLevel},${this.currRow},${this.currCol}`
     }
+
+    toJSON(){
+        return {
+            currLevel: this.currLevel,
+            currRow: this.currRow,
+            currCol: this.currCol,
+        }
+    }
+
 }
 
 export default Player;
