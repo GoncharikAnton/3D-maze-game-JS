@@ -76,7 +76,7 @@ class AStar extends SearchAlgorithm {
         }
 
         const path = graph.findShortestRoute(start, goal)
-        this.#numberOfNodesEvaluated = path.length;
+        this.#numberOfNodesEvaluated = toD.length;
         return path;
     }
 

@@ -1,6 +1,7 @@
 import MazeController from "./mazeController.js";
 import MazeDBController from "./mazeDBController.js";
 import {clearErrorMessages, formValidation, showErrorLoad, showErrorName,} from "./formValidation.js";
+import SearchDemo from "./searchDemo.js";
 
 const form = document.querySelector('#createForm');
 const nameInp = document.querySelector('#user-name-inp');
@@ -13,6 +14,9 @@ const saveTheGame = document.querySelector('#save-the-game');
 const loadPreviewsGame = document.querySelector('#load-the-game');
 const nameOfPreviewsGameInp = document.querySelector('#last-game-name-inp');
 const selectedSearchAlgo = document.querySelector('#search-algo');
+
+const demo = new SearchDemo(20,20);
+demo.run()
 
 let controller, intervalId; // empty variables for future data passing.
 

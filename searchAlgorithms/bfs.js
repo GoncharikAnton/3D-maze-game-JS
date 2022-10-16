@@ -3,7 +3,7 @@ import Directions from "../directions.js";
 
 class BFS extends SearchAlgorithm {
     #numberOfNodesEvaluated
-
+    #countOfNodes
     constructor() {
         super();
         this.#numberOfNodesEvaluated = false;
@@ -15,29 +15,42 @@ class BFS extends SearchAlgorithm {
      * @returns Set
      */
     search(searchable) {
-        const goal = searchable.goalState; // str                                                       5
+        const goal = searchable.goalState; // str
         const queue = [];
         const visited = new Set();
-        const initNode = searchable.initNode // node object // initial-state
-        queue.push(initNode.coordinates);
+        const initNode = [searchable.initNode, []] // node object // initial-state
+        queue.push(initNode);
+
         while (queue.length > 0) {
 
             const currNode = queue.pop();
 
-            const coordinates = currNode.toString(); // string representation of the node
+            const coordinates = currNode[0].coordinates;
             if (coordinates === goal) {
                 this.#numberOfNodesEvaluated = visited.size;
-                return visited;
+
+                const pathCells = currNode[1];
+                const path = [];
+                for (let i = 0; i < pathCells.length; i++) {
+                    path.push(pathCells[i][0].coordinates)
+                }
+                path.push(goal)
+                this.#countOfNodes = path.length;
+                return path;
             }
-            let neighbors = searchable.getNeighbors(currNode); // neighbors of the node represented by strings
-            for (const neighborCoordinates of neighbors) {
-                if (!visited.has(neighborCoordinates)) {
-                    visited.add(neighborCoordinates);
-                    queue.unshift(neighborCoordinates);
+            let neighbors = searchable.getNeighbors(currNode[0]); // neighbors of the node represented by strings
+            for (const neighbor of neighbors) {
+                console.log(neighbor)
+                const neigh = searchable.getNode(neighbor)
+                if (!visited.has(neigh.coordinates)) {
+                    visited.add(neigh.coordinates);
+                    queue.unshift([neigh, [...currNode[1], currNode]]);
                 }
             }
         }
-        return visited;
+
+        return false;
+
     }
 
     /**
@@ -45,26 +58,8 @@ class BFS extends SearchAlgorithm {
      * @returns Number
      */
     getNumberOfNodesEvaluated() {
-        return this.#numberOfNodesEvaluated
+        return this.#numberOfNodesEvaluated;
     }
-
-
-    isLegalMove(prev, next){
-        const directions = new Directions().directions;
-        const prevCell = prev.split(',');
-
-        for (let i = 0; i < directions.length; i++) {
-            const z = directions[i][0];
-            const y = directions[i][1];
-            const x = directions[i][2];
-            let dir = `${+prevCell[0] + +z},${+prevCell[1] + +y},${+prevCell[2] + +x}`;
-            if(dir === next){
-                return true;
-            }
-        }
-        return false;
-    }
-
 }
 
 export default BFS;

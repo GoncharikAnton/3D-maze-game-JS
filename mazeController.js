@@ -180,10 +180,9 @@ class MazeController {
 
         const search = this.testSearchAlgorithm(this.algo, this.searchable);
         const solution = Array.from(search[0]);
-        const numOfNodes = search[1];
+        const numOfNodes = solution.length;
         let moveCount = 0;
         let prevLocation = this.player.coordinates;
-
         const interval = setInterval(() => {
             let nextLocation;
             nextLocation = solution[moveCount];
