@@ -49,7 +49,7 @@ class Maze3D {
         return this.maze[i][j][k].getValidNeighbors(this.rows, this.cols);
     }
 
-    toJSON(){
+    toJSON() {
         return {
             maze: this.#maze,
             entranceCell: this.#entranceCell,
@@ -57,29 +57,25 @@ class Maze3D {
             levels: this.#levels,
             rows: this.#rows,
             cols: this.#cols,
-            getNodeByCoordinates: this.getNodeByCoordinates,
-            getNeighborsOfTheNode: this.getNeighborsOfTheNode
         }
-        }
+    }
 
     toString() {
-        for (let i = 0; i < this.#maze.length; i++) {
+        for (let i = 0; i < this.maze.length; i++) {
             console.log(`\nLevel ${i}\n`);
-            for (let j = 0; j < this.#maze[i].length; j++) {
+            for (let j = 0; j < this.maze[i].length; j++) {
                 let strTop = '';
                 let strMid = '';
                 let strBottom = '';
-                const nextRow = this.#maze[i][j + 1];
-                for (let k = 0; k < this.#maze[i][0].length; k++) {
-                    const cell = this.#maze[i][j][k];
-                    const nextCell = this.#maze[i][j][k + 1];
-                    const prevCell = this.#maze[i][j][k - 1];
+                const nextRow = this.maze[i][j + 1];
+                for (let k = 0; k < this.maze[i][0].length; k++) {
+                    const cell = this.maze[i][j][k];
+                    const nextCell = this.maze[i][j][k + 1];
+                    const prevCell = this.maze[i][j][k - 1];
                     cell.topPass ? strTop += '  ' : strTop += '+-';
                     nextCell && !prevCell ? strMid += '|' : strMid += '';
                     if (cell.isExit || cell.isEntrance) {
                         cell.isEntrance ? strMid += 'S' : strMid += 'E';
-                        cell.upPass = false;
-                        cell.downPass = false;
                     } else if (cell.upPass && cell.downPass) {
                         strMid += '↕';
                     } else if (cell.upPass) {
@@ -116,4 +112,5 @@ class Maze3D {
         }
     }
 }
+
 export default Maze3D;

@@ -1,5 +1,4 @@
 import DFSMaze3dGenerator from "./generators/DFSMaze3dGenerator.js";
-import {MazeDomain, MazeState} from "./searchable.js";
 import AStar from "./searchAlgorithms/aStar.js";
 import SimpleMaze3dGenerator from "./generators/simpleMaze3dGenerator.js";
 import AldousBroderMaze3dGenerator from "./generators/aldousBroderMaze3dGenerator.js";
@@ -11,8 +10,10 @@ import Directions from "./directions.js";
 import Maze3D from "./maze3d.js";
 import Maze3DGenerator from "./maze3DGenerator.js";
 import Cell from "./cell.js";
+import {MazeState} from "./searchable/mazeState.js";
+import {MazeDomain} from "./searchable/mazeDomain.js";
 
-class MazeController{
+class MazeController {
     #maze
     #player
     #view
@@ -20,9 +21,10 @@ class MazeController{
     #searchable
     #algo
     #directions
+
     constructor(maze = false, player = false) {
         this.#directions = new Directions();
-        if(maze && player){
+        if (maze && player) {
             this.#maze = maze;
             Object.setPrototypeOf(this.#maze, Maze3D.prototype)
             for (let i = 0; i < this.#maze.maze.length; i++) {
@@ -31,7 +33,6 @@ class MazeController{
                         Object.setPrototypeOf(this.#maze.maze[i][j][k], Cell.prototype);
                         Object.setPrototypeOf(this.#maze.entranceCell, Cell.prototype);
                         Object.setPrototypeOf(this.#maze.exitCell, Cell.prototype);
-
                     }
                 }
             }
@@ -44,7 +45,7 @@ class MazeController{
         return this.#view;
     }
 
-    get directions(){
+    get directions() {
         return this.#directions;
     }
 
@@ -60,7 +61,7 @@ class MazeController{
         return this.#algo;
     }
 
-    get maze () {
+    get maze() {
         return this.#maze;
     }
 
@@ -69,9 +70,7 @@ class MazeController{
     }
 
 
-
-    createMaze(rowInp , colInp , db = false){
-        // Temporary solution
+    createMaze(rowInp, colInp, db = false) {
         if (!db) {
             const rowInpValue = Number(rowInp);
             const colInpValue = Number(colInp);
@@ -80,7 +79,7 @@ class MazeController{
             const mazeGen = new DFSMaze3dGenerator();
             this.#maze = mazeGen.generate(rowInpValue, colInpValue); // rowInp, colInp int
             this.#player = new Player(this.maze.entranceCell.levelNum, this.maze.entranceCell.rowNum, this.maze.entranceCell.colNum);
-            this.#view = new MazeView(this.maze, this.player)
+            this.#view = new MazeView(this.maze, this.player);
             this.#mazeState = new MazeState(this.maze);
             this.#searchable = new MazeDomain(this.mazeState);
             this.view.mazeView(rowInpValue, colInpValue);
@@ -95,29 +94,30 @@ class MazeController{
             this.#searchable = new MazeDomain(this.mazeState);
             this.view.mazeView(rowInpValue, colInpValue);
         }
+        this.maze.toString();
     }
 
-    makeMove(keyDirection){
+    makeMove(keyDirection) {
         const directions = this.directions.directions;
         const key = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'];
-        if(key.indexOf(keyDirection) !== -1){
+        if (key.indexOf(keyDirection) !== -1) {
             let currPlayerPosition = this.player.coordinates;
             const keyIdx = key.indexOf(keyDirection);
             const chosenDirection = directions[keyIdx];
-            const validMoves = this.maze.getNeighborsOfTheNode(currPlayerPosition) // valid moves
+            const validMoves = this.maze.getNeighborsOfTheNode(currPlayerPosition); // valid moves
             const wantedMove = [];
-            currPlayerPosition = currPlayerPosition.split(',')
+            currPlayerPosition = currPlayerPosition.split(',');
             for (let i = 0; i < 3; i++) {
-                wantedMove.push(chosenDirection[i] + Number(currPlayerPosition[i]))
+                wantedMove.push(chosenDirection[i] + Number(currPlayerPosition[i]));
             }
             if (validMoves.has(wantedMove.toString())) {
                 // change player location -> reRender player Position
                 const currLocation = this.player.coordinates;
-                const nextLocation = wantedMove.toString()
+                const nextLocation = wantedMove.toString();
                 this.changePlayerLocation(currLocation, nextLocation);
             }
         }
-
+        this.checkWin();
     }
 
     changePlayerLocation(prevLocation, nextLocation) {
@@ -137,9 +137,15 @@ class MazeController{
         }
     }
 
-    solveTheGame(algorithm = 'bfs'){
-        this.#algo = new AStar(); // to make it dynamic
-        // this.#algo = new DFS(); // to make it dynamic
+    solveTheGame(algorithm = 'bfs') {
+
+        if (algorithm === 'bfs') {
+            this.#algo = new BFS();
+        } else if (algorithm === 'dfs') {
+            this.#algo = new DFS();
+        } else {
+            this.#algo = new AStar();
+        }
         const search = this.testSearchAlgorithm(this.algo, this.searchable);
         const solution = Array.from(search[0]);
         const numOfNodes = search[1];
@@ -154,20 +160,23 @@ class MazeController{
             if (moveCount === numOfNodes) {
                 clearInterval(interval);
             }
-        }, 700);
+        }, 500);
+        return interval;
     }
-    nextBestMove(){
-        if(this.player.coordinates !== this.maze.exitCell.coordinates){
-            const algo = new AStar(this.player.coordinates); // to make it dynamic
+
+
+    nextBestMove() {
+        if (this.player.coordinates !== this.maze.exitCell.coordinates) {
+            const algo = new AStar(this.player.coordinates);
             const search = this.testSearchAlgorithm(algo, this.searchable);
-            if(search){
+            if (search) {
                 const solution = Array.from(search[0]);
-                this.view.renderNextMove(solution[1])
+                this.view.renderNextMove(solution[1]);
             }
         }
-        }
+    }
 
-    resetPosition(){
+    resetPosition() {
         const entranceCoordinates = this.maze.entranceCell.coordinates;
         this.maze.getNodeByCoordinates(this.player.coordinates).player = false;
         this.maze.entranceCell.player = true;
@@ -184,6 +193,11 @@ class MazeController{
         return [solution, numOfNodes];
     }
 
+    checkWin() {
+        if (this.player.coordinates === this.maze.exitCell.coordinates) {
+            alert('You win!!!');
+        }
+    }
 
 
 }

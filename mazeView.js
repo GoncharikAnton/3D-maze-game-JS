@@ -1,5 +1,5 @@
 class MazeView{
-    #maze;
+    #maze
     #player
     constructor(maze, player) {
         this.#maze = maze;
@@ -10,7 +10,7 @@ class MazeView{
         const mazeContainer = document.querySelector('#maze-container');
         const mazeLevelHeader = document.querySelector('#level-header');
         mazeContainer.innerHTML = '';
-        mazeLevelHeader.textContent = ''
+        mazeLevelHeader.textContent = '';
         mazeContainer.style.width = (colInp * 25 + 4)  + 'px';
         mazeContainer.style.height = (rowInp * 25 + 4)  + 'px';
 
@@ -30,12 +30,12 @@ class MazeView{
                 cell.leftPass === false ? l = 1 : l = 0;
 
                 if(cell.upPass && cell.downPass){
-                    div.innerText = '↕'
+                    div.innerText = '↕';
                 }else if(cell.upPass){
-                    div.innerText = '↑'
+                    div.innerText = '↑';
 
                 }else if(cell.downPass){
-                    div.innerText = '↓'
+                    div.innerText = '↓';
                 }
                 if(cell.player === true){
                     div.innerHTML += `<image src="avatar.png" id="player">`
@@ -47,7 +47,7 @@ class MazeView{
                 div.style.borderRight = `${r}px solid black`;
                 div.style.borderBottom = `${b}px solid black`;
                 div.style.borderLeft = `${l}px solid black`;
-                div.classList.add('cell')
+                div.classList.add('cell');
                 mazeContainer.appendChild(div);
             }
         }
@@ -71,13 +71,14 @@ class MazeView{
         if(+loc[0] !==  this.#player.currLevel){
             div = document.querySelector(`[data-id="${this.#player.coordinates}"]`);
         }else{
-            div = document.querySelector(`[data-id="${location}"]`)
+            div = document.querySelector(`[data-id="${location}"]`);
         }
-        const prevBGColor = div.style.backgroundColor
+        const prevBGColor = div.style.backgroundColor;
         div.style.backgroundColor = 'purple';
+        // makes highlight of the next move dynamic
         setTimeout(() => {
             div.style.backgroundColor = prevBGColor;
-        }, 1500)
+        }, 300);
 
 
     }

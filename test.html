@@ -12,56 +12,58 @@
 <body>
 <div id="root">
     <section id="form-section">
-        <form action="#">
+        <form action="#" novalidate id="createForm">
             <div class="input-div">
                 <label for="user-name-inp">Name</label>
                 <input type="text" id="user-name-inp" required pattern="^[A-Za-z]+$" value="a">
+                <p style="width: 100%" class="error-message" id="nameError"></p>
             </div>
             <div class="input-div">
                 <label for="rows-inp">Rows</label>
-                <input type="number" id="rows-inp" required value="5">
+                <input type="number" id="rows-inp" required value="5" pattern="^[0-9]+$">
+                <p style="width: 100%" class="error-message" id="rowsError"></p>
             </div>
             <div class="input-div">
                 <label for="cols-inp">Cols</label>
-                <input type="number" id="cols-inp" required value="5">
+                <input type="number" id="cols-inp" required value="5" pattern="^[0-9]+$">
+                <p style="width: 100%" class="error-message" id="colsError"></p>
             </div>
             <div class="input-div">
                 <button id="start-new-game-btn">Start New Game</button>
             </div>
         </form>
 
-        <div class="input-div">
-            <button id="save-the-game">Save current game</button>
+
+        <div id="control-buttons">
+            <div class="input-div">
+                <button id="save-the-game">Save current game</button>
+            </div>
+            <div class="input-div">
+                <label for="search-algo">Search Algorithm</label>
+                <select name="searchAlgo" id="search-algo">
+                    <option value="bfs" selected>BFS</option>
+                    <option value="dfs">DFS</option>
+                    <option value="astar">AStar</option>
+                </select>
+            </div>
+            <div class="input-div">
+                <button id="solve-game-btn">Solve Game</button>
+            </div>
+
+            <div class="input-div">
+                <button id="reset-game-btn">Reset Game</button>
+            </div>
+
+            <div class="input-div">
+                <button id="show-next-move-btn">Show the best next move</button>
+            </div>
         </div>
 
 
         <div class="input-div">
-            <label for="search-algo">Search Algorithm</label>
-            <select name="searchAlgo" id="search-algo">
-                <option value="bfs" selected>BFS</option>
-                <option value="dfs">DFS</option>
-                <option value="astar">AStar</option>
-            </select>
-        </div>
-        <div class="input-div">
-            <button id="solve-game-btn">Solve Game</button>
-        </div>
-
-        <div class="input-div">
-            <button id="reset-game-btn">Reset Game</button>
-        </div>
-
-        <div class="input-div">
-            <button id="show-next-move-btn">Show the best next move</button>
-        </div>
-
-
-
-
-
-        <label for="last-game-name-inp">Name of the last game</label>
-        <div class="input-div">
-            <input type="text" id="last-game-name-inp">
+            <label for="last-game-name-inp">Name of the last game</label>
+            <input type="text" id="last-game-name-inp" required pattern="^[A-Za-z]+$">
+            <p style="width: 100%" class="error-message" id="loadError"></p>
         </div>
         <div class="input-div">
             <button id="load-the-game">Load game</button>
