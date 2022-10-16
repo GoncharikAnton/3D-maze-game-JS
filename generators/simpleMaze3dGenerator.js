@@ -19,10 +19,10 @@ class SimpleMaze3dGenerator extends Maze3dGenerator {
                 for (let k = 0; k < cols; k++) {
                     const cell = this.#maze.maze[i][j][k];
                     const allNeighbors = this.#getAllNeighbors(this.#maze, cell);
-                    const randomNeighborNum = Randomizer.randomNumMinMax(0, allNeighbors.length-1);
+                    const randomNeighborNum = Randomizer.randomNumMinMax(0, allNeighbors.length - 1);
                     const neighborCell = this.#maze.getNodeByCoordinates(allNeighbors[+randomNeighborNum]);
                     this.#removeWalls(cell, neighborCell);
-                    if(i === 0){
+                    if (i === 0) {
                         cell.downPass = false;
                     }
                 }

@@ -1,4 +1,4 @@
-class MazeView{
+class MazeView {
     #maze
     #player
 
@@ -17,13 +17,13 @@ class MazeView{
      * @param rowInp
      * @param colInp
      */
-    mazeView(rowInp = this.#maze.rows, colInp = this.#maze.cols){
+    mazeView(rowInp = this.#maze.rows, colInp = this.#maze.cols) {
         const mazeContainer = document.querySelector('#maze-container');
         const mazeLevelHeader = document.querySelector('#level-header');
         mazeContainer.innerHTML = '';
         mazeLevelHeader.textContent = '';
-        mazeContainer.style.width = (colInp * 25 + 4)  + 'px';
-        mazeContainer.style.height = (rowInp * 25 + 4)  + 'px';
+        mazeContainer.style.width = (colInp * 25 + 4) + 'px';
+        mazeContainer.style.height = (rowInp * 25 + 4) + 'px';
 
 
         const currLevel = this.#player.currLevel;
@@ -40,15 +40,15 @@ class MazeView{
                 cell.leftPass === false ? l = 1 : l = 0;
                 cell.leftPass === false ? l = 1 : l = 0;
 
-                if(cell.upPass && cell.downPass){
+                if (cell.upPass && cell.downPass) {
                     div.innerText = '↕';
-                }else if(cell.upPass){
+                } else if (cell.upPass) {
                     div.innerText = '↑';
 
-                }else if(cell.downPass){
+                } else if (cell.downPass) {
                     div.innerText = '↓';
                 }
-                if(cell.player === true){
+                if (cell.player === true) {
                     div.innerHTML += `<image src="avatar.png" id="player">`
                     div.dataset.player = 'true';
                 }
@@ -69,12 +69,12 @@ class MazeView{
      * @param prevLocation string representation of the cell(node) coordinates
      * @param nextLocation string representation of the cell(node) coordinates
      */
-    reRenderPlayerLocation(prevLocation, nextLocation){
+    reRenderPlayerLocation(prevLocation, nextLocation) {
         const prevDiv = document.querySelector(`[data-id="${prevLocation}"]`);
         const nextDiv = document.querySelector(`[data-id="${nextLocation}"]`);
-        if (prevDiv.textContent){
+        if (prevDiv.textContent) {
             prevDiv.innerHTML = prevDiv.textContent.slice(0, 1);
-        }else{
+        } else {
             prevDiv.textContent = '';
         }
         nextDiv.innerHTML += `<image src="avatar.png" id="player">`;
@@ -84,13 +84,13 @@ class MazeView{
      * Method highlights (changes backgrund color) a cell for the next best move.
      * @param location
      */
-    renderNextMove(location){
+    renderNextMove(location) {
         let loc = location.split(',');
         let div;
 
-        if(+loc[0] !==  this.#player.currLevel){
+        if (+loc[0] !== this.#player.currLevel) {
             div = document.querySelector(`[data-id="${this.#player.coordinates}"]`);
-        }else{
+        } else {
             div = document.querySelector(`[data-id="${location}"]`);
         }
         const prevBGColor = div.style.backgroundColor;

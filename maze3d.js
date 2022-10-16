@@ -1,4 +1,3 @@
-
 /**
  *
  * Class represents maze board instance.

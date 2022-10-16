@@ -1,16 +1,20 @@
 /**
  * Class represents an abstract search algorithm.
  */
-class SearchAlgorithm{
+class SearchAlgorithm {
     /**
      * Method finds the path (shortest?) to get to the goal state from the start state.
      * @param searchable unified search problem.
      */
-    search(searchable) {}
+    search(searchable) {
+    }
+
     /**
      * Returns number of nodes required to make to get to the goal state.
      * @returns Number
      */
-    getNumberOfNodesEvaluated() {}
+    getNumberOfNodesEvaluated() {
+    }
 }
+
 export default SearchAlgorithm;

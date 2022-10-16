@@ -23,9 +23,10 @@ class Cell {
      * Method returns coordinates of the position of the cell in the graph(maze).
      * @returns {string}
      */
-    toString(){
+    toString() {
         return `${this.levelNum},${this.rowNum},${this.colNum}`
     }
+
     get coordinates() {
         return `${this.levelNum},${this.rowNum},${this.colNum}`
     }
@@ -76,4 +77,5 @@ class Cell {
     }
 
 }
+
 export default Cell;

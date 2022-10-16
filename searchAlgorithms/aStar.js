@@ -2,13 +2,14 @@ import SearchAlgorithm from "./searchAlgoAbstract.js";
 import PriorityQueue from "../priorityQueue.js";
 import Graph from "./forAStar/graph.js";
 
-class AStar extends SearchAlgorithm{
+class AStar extends SearchAlgorithm {
     #numberOfNodesEvaluated
     #position
+
     constructor(position = false) {
         super();
         this.#numberOfNodesEvaluated = false;
-        if(position){
+        if (position) {
             this.#position = position
         }
     }
@@ -32,9 +33,9 @@ class AStar extends SearchAlgorithm{
      */
     search(searchable) {
         let start;
-        if(this.#position){
+        if (this.#position) {
             start = this.#position
-        }else{
+        } else {
             start = searchable.startState;
         }
         const goal = searchable.goalState;
@@ -89,8 +90,6 @@ class AStar extends SearchAlgorithm{
     getNumberOfNodesEvaluated() {
         return this.#numberOfNodesEvaluated;
     }
-
-
 
 
 }

@@ -24,7 +24,7 @@ loadPreviewsGame.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', e => {
-    if(controller){
+    if (controller) {
         controller.makeMove(e.key);
     }
 });
@@ -48,8 +48,8 @@ showNextMove.addEventListener('click', () => {
     controller.nextBestMove();
 });
 saveTheGame.addEventListener('click', () => {
-        clearErrorMessages();
-        MazeDBController.saveGame(nameInp.value, controller.maze, controller.player);
+    clearErrorMessages();
+    MazeDBController.saveGame(nameInp.value, controller.maze, controller.player);
 });
 
 /**
@@ -63,7 +63,7 @@ function showControlBtns() {
 /**
  * Checks user input and if it's valid, function creates the instance of controller with loaded data of the asked game.
  */
-function loadPrevGame () {
+function loadPrevGame() {
     if (!nameOfPreviewsGameInp.checkValidity()) {
         showErrorName(nameOfPreviewsGameInp, 'loadError');
     } else if (!localStorage.getItem(nameOfPreviewsGameInp.value + 'm')) {
@@ -83,7 +83,7 @@ function loadPrevGame () {
  * Function validates user form input and creates a controller instance.
  * @param e
  */
-function createGame(e){
+function createGame(e) {
     const validated = formValidation(form, nameInp, rowInp, colInp);
     if (!validated) {
         e.preventDefault();

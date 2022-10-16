@@ -192,7 +192,7 @@ class Maze3dGenerator {
                     }
                 }
             }
-            if(+cell.levelNum === 0){
+            if (+cell.levelNum === 0) {
                 cell.downPass = false;
             }
         }
@@ -235,4 +235,5 @@ class Maze3dGenerator {
         }
     }
 }
+
 export default Maze3dGenerator;

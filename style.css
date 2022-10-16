@@ -36,9 +36,11 @@
 #maze-section {
     margin: 10px;
 }
-#control-buttons{
+
+#control-buttons {
     display: none;
 }
+
 input {
     flex-basis: 100%;
 }

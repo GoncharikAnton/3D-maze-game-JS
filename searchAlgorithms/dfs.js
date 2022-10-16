@@ -1,17 +1,19 @@
 import SearchAlgorithm from "./searchAlgoAbstract.js";
 
-class DFS extends SearchAlgorithm{
+class DFS extends SearchAlgorithm {
     #numberOfNodesEvaluated
+
     constructor() {
         super();
         this.#numberOfNodesEvaluated = false;
     }
+
     /**
      * Method finds the path to get to the goal state from the start state.
      * @param searchable unified search problem.
      * @returns Set
      */
-    search(searchable){
+    search(searchable) {
         const initNode = searchable.initNode;
         const stack = [];
         const visited = new Set();
@@ -33,6 +35,7 @@ class DFS extends SearchAlgorithm{
         }
         return false
     }
+
     /**
      * Returns number of nodes required to make to get to the goal state.
      * @returns Number

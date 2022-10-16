@@ -1,7 +1,7 @@
 /**
  * Represents possible directions in the maze.
  */
-class Directions{
+class Directions {
     #directions
     #rightDirection
     #leftDirection
@@ -9,6 +9,7 @@ class Directions{
     #bottomDirection
     #upDirection
     #downDirection
+
     constructor() {
         this.#directions = [
             [0, 0, 1], // right
@@ -21,13 +22,13 @@ class Directions{
         this.#rightDirection = [0, 0, 1];
         this.#leftDirection = [0, 0, -1];
         this.#topDirection = [0, -1, 0];
-        this.#bottomDirection =  [0, 1, 0];
+        this.#bottomDirection = [0, 1, 0];
         this.#upDirection = [1, 0, 0];
         this.#downDirection = [-1, 0, 0];
     }
 
 
-    get  directions() {
+    get directions() {
         return this.#directions;
     }
 

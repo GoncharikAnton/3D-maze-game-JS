@@ -1,4 +1,4 @@
-class Player{
+class Player {
     #currLevel
     #currRow
     #currCol
@@ -14,6 +14,7 @@ class Player{
         this.#currRow = currRow;
         this.#currCol = currCol;
     }
+
     get currLevel() {
         return this.#currLevel;
     }
@@ -37,7 +38,8 @@ class Player{
     set currCol(value) {
         this.#currCol = value;
     }
-    get coordinates(){
+
+    get coordinates() {
         return `${this.currLevel},${this.currRow},${this.currCol}`
     }
 
@@ -45,7 +47,7 @@ class Player{
      * Method returns JSON representation of the player instance.
      * @returns {{currRow: *, currCol: *, currLevel: *}}
      */
-    toJSON(){
+    toJSON() {
         return {
             currLevel: this.currLevel,
             currRow: this.currRow,

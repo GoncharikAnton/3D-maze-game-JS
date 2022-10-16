@@ -87,9 +87,9 @@ class MazeController {
         if (!db) {
             const rowInpValue = Number(rowInp);
             const colInpValue = Number(colInp);
-            // const mazeGen = new AldousBroderMaze3dGenerator();
+            const mazeGen = new AldousBroderMaze3dGenerator();
             // const mazeGen = new SimpleMaze3dGenerator();
-            const mazeGen = new DFSMaze3dGenerator();
+            // const mazeGen = new DFSMaze3dGenerator();
             this.#maze = mazeGen.generate(rowInpValue, colInpValue); // rowInp, colInp int
             this.#player = new Player(this.maze.entranceCell.levelNum, this.maze.entranceCell.rowNum, this.maze.entranceCell.colNum);
             this.#view = new MazeView(this.maze, this.player);

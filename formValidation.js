@@ -7,21 +7,21 @@
  * @param colInp
  * @returns {boolean}
  */
-export function formValidation(form, nameInp, rowInp, colInp){
-        let validated = true;
-        if (!nameInp.checkValidity()) {
-            showErrorName(nameInp, 'nameError');
-            validated = false;
-        }
-        if (!rowInp.checkValidity()) {
-            showErrorNumInp(rowInp, 'rowsError');
-            validated = false;
-        }
-        if (!colInp.checkValidity()) {
-            showErrorNumInp(colInp,'colsError');
-            validated = false;
-        }
-        return validated;
+export function formValidation(form, nameInp, rowInp, colInp) {
+    let validated = true;
+    if (!nameInp.checkValidity()) {
+        showErrorName(nameInp, 'nameError');
+        validated = false;
+    }
+    if (!rowInp.checkValidity()) {
+        showErrorNumInp(rowInp, 'rowsError');
+        validated = false;
+    }
+    if (!colInp.checkValidity()) {
+        showErrorNumInp(colInp, 'colsError');
+        validated = false;
+    }
+    return validated;
 }
 
 /**
@@ -38,6 +38,7 @@ export function showErrorName(nameInp, inpTitle) {
     }
     nameError.className = 'error';
 }
+
 /**
  * Renders an error message to the user.
  * @param i
@@ -47,11 +48,12 @@ export function showErrorNumInp(inp, inpTitle) {
     const inpTitleError = document.querySelector(`#${inpTitle}`); // row or col
     if (inp.validity.valueMissing) {
         inpTitleError.textContent = 'You need to enter a positive number.';
-    } else{
+    } else {
         inpTitleError.textContent = 'Number must to be positive and more than 2.';
     }
     inpTitleError.className = 'error';
 }
+
 /**
  * Renders an error message to the user.
  * @param nameInp
@@ -62,10 +64,11 @@ export function showErrorLoad(nameInp, inpTitle) {
     nameError.textContent = 'There is no game with this name...'
     nameError.className = 'error';
 }
+
 /**
  * Renders an error message to the user.
  */
-export function clearErrorMessages(){
+export function clearErrorMessages() {
     const errorMessages = document.querySelectorAll('.error');
     for (const errorMessage of errorMessages) {
         errorMessage.textContent = '';

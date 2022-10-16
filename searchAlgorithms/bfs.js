@@ -1,17 +1,19 @@
 import SearchAlgorithm from "./searchAlgoAbstract.js";
 
-class BFS extends SearchAlgorithm{
+class BFS extends SearchAlgorithm {
     #numberOfNodesEvaluated
+
     constructor() {
         super();
         this.#numberOfNodesEvaluated = false;
     }
+
     /**
      * Method finds the path to get to the goal state from the start state.
      * @param searchable unified search problem.
      * @returns Set
      */
-    search(searchable){
+    search(searchable) {
         const goal = searchable.goalState; // str
         const queue = [];
         const visited = new Set();
@@ -26,7 +28,7 @@ class BFS extends SearchAlgorithm{
             }
             let neighbors = searchable.getNeighbors(currNode); // neighbors of the node represented by strings
             for (const neighborCoordinates of neighbors) {
-                if(!visited.has(neighborCoordinates)){
+                if (!visited.has(neighborCoordinates)) {
                     visited.add(neighborCoordinates);
                     queue.unshift(neighborCoordinates);
                 }
@@ -44,4 +46,5 @@ class BFS extends SearchAlgorithm{
     }
 
 }
+
 export default BFS;

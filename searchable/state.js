@@ -1,4 +1,4 @@
-export class State{
+export class State {
     #key
 
     constructor(key) {
@@ -7,24 +7,31 @@ export class State{
         }
         this.#key = key;
     }
-    get start(){
+
+    get start() {
         throw new Error(`You have to implement the method start!`);
     }
-    get goal(){
+
+    get goal() {
         throw new Error('You have to implement the method goal!');
     }
-    get initNode(){
+
+    get initNode() {
         throw new Error('You have to implement the method initNode!');
     }
-    getNode(coordinates){
+
+    getNode(coordinates) {
         throw new Error('You have to implement the method getNode!');
     }
-    validNeighbors(node){
+
+    validNeighbors(node) {
         throw new Error('You have to implement the method validNeighbors!');
     }
+
     get key() {
         return this.#key;
     }
+
     equals(other) {
         return other instanceof State && this.#key === other.#key;
     }

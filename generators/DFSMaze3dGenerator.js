@@ -67,4 +67,5 @@ class DFSMaze3dGenerator extends Maze3dGenerator {
         return super.measureAlgorithmTime(this, rows, cols);
     }
 }
+
 export default DFSMaze3dGenerator;
