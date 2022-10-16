@@ -22,8 +22,15 @@ class MazeController {
     #algo
     #directions
 
+    /**
+     * Class-controller for manage the state of the maze and player instances.
+     * @param maze Maze3D instance
+     * @param player Player instance
+     */
     constructor(maze = false, player = false) {
         this.#directions = new Directions();
+
+        // Check if we need to create a new instances of maze and player or them were passed from database.
         if (maze && player) {
             this.#maze = maze;
             Object.setPrototypeOf(this.#maze, Maze3D.prototype)
@@ -69,7 +76,13 @@ class MazeController {
         return this.#player;
     }
 
-
+    /**
+     * Method initiate all instances for manage and after initialization it renders the maze board with the player.
+     *
+     * @param rowInp number
+     * @param colInp number
+     * @param db boolean
+     */
     createMaze(rowInp, colInp, db = false) {
         if (!db) {
             const rowInpValue = Number(rowInp);
@@ -97,6 +110,11 @@ class MazeController {
         this.maze.toString();
     }
 
+    /**
+     * Checks required move for validity and if it is valid invokes this.changePlayerLocation.
+     * After each move method checks if move was a final.
+     * @param keyDirection String - direction of the move
+     */
     makeMove(keyDirection) {
         const directions = this.directions.directions;
         const key = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'];
@@ -120,6 +138,12 @@ class MazeController {
         this.checkWin();
     }
 
+    /**
+     * Changes Player current location. If needed (maze level is different from player current level), invokes
+     * rerender maze function.
+     * @param prevLocation string coordinates
+     * @param nextLocation string coordinates
+     */
     changePlayerLocation(prevLocation, nextLocation) {
         const [i, j, k] = nextLocation.split(',')
         const prevI = Number(prevLocation.split(',')[0])
@@ -137,6 +161,13 @@ class MazeController {
         }
     }
 
+    /**
+     * Method invokes selected searcher and solves the maze problem.
+     * After the solving it shows the whole path from the start node to the goal node by rerender the player position
+     * on the board.
+     * @param algorithm
+     * @returns {number}
+     */
     solveTheGame(algorithm = 'bfs') {
 
         if (algorithm === 'bfs') {
@@ -146,11 +177,13 @@ class MazeController {
         } else {
             this.#algo = new AStar();
         }
+
         const search = this.testSearchAlgorithm(this.algo, this.searchable);
         const solution = Array.from(search[0]);
         const numOfNodes = search[1];
         let moveCount = 0;
         let prevLocation = this.player.coordinates;
+
         const interval = setInterval(() => {
             let nextLocation;
             nextLocation = solution[moveCount];
@@ -159,12 +192,16 @@ class MazeController {
             moveCount++;
             if (moveCount === numOfNodes) {
                 clearInterval(interval);
+                this.resetPosition();
             }
         }, 500);
         return interval;
     }
 
-
+    /**
+     * Solves the maze problem from the current player position with AStar algorithm and shows on the board next
+     * best move by highlighting the node.
+     */
     nextBestMove() {
         if (this.player.coordinates !== this.maze.exitCell.coordinates) {
             const algo = new AStar(this.player.coordinates);
@@ -176,30 +213,45 @@ class MazeController {
         }
     }
 
+    /**
+     * Resets player current position to position of the start node and invokes rerender of the board.
+     */
     resetPosition() {
         const entranceCoordinates = this.maze.entranceCell.coordinates;
+
         this.maze.getNodeByCoordinates(this.player.coordinates).player = false;
         this.maze.entranceCell.player = true;
+
         const [i, j, k] = entranceCoordinates.split(',');
         this.player.currLevel = +i;
         this.player.currRow = +j;
         this.player.currCol = +k;
+
         this.view.mazeView();
     }
 
+    /**
+     * Method returns the solution of the problem.
+     * solution - path from the start to the goal state.
+     * numOfNodes - number of nodes(moves) to the goal state.
+     * @param searchAlgo search algorithm
+     * @param searchable unified search problem
+     * @returns {*[]}
+     */
     testSearchAlgorithm(searchAlgo, searchable) {
         const solution = searchAlgo.search(searchable);
         const numOfNodes = searchAlgo.getNumberOfNodesEvaluated();
         return [solution, numOfNodes];
     }
 
+    /**
+     * Checks if player current location equal to the goal cell(node) coordinates.
+     */
     checkWin() {
         if (this.player.coordinates === this.maze.exitCell.coordinates) {
             alert('You win!!!');
         }
     }
-
-
 }
 
 export default MazeController;

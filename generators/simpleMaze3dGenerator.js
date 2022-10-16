@@ -1,6 +1,7 @@
 import Maze3dGenerator from "../maze3DGenerator.js";
 import Randomizer from "../randomaizer.js";
 
+
 class SimpleMaze3dGenerator extends Maze3dGenerator {
     #maze
 

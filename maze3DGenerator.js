@@ -2,6 +2,9 @@ import Randomizer from "./randomaizer.js";
 import Cell from "./cell.js";
 import Maze3D from "./maze3d.js";
 
+/**
+ * Class represents maze-generator, that generate a blueprint of the impassable maze boardю.
+ */
 class Maze3dGenerator {
 
     constructor() {
@@ -64,14 +67,10 @@ class Maze3dGenerator {
                         entranceCell = cell;
                         entranceCell.isEntrance = true;
                         entranceCell.player = true;
-                        // entranceCell.upPass = true;
-                        // entranceCell.downPass = true;
                     }
                     if (i === randomLevelExt && j === randomRowExt && k === randomColExt) {
                         exitCell = cell;
                         exitCell.isExit = true;
-                        // exitCell.upPass = true;
-                        // exitCell.downPass = true;
                     }
                 }
             }

@@ -16,7 +16,6 @@ class Cell {
         this.isExit = false;
         this.isEntrance = false;
         this.visited = false;
-        this.visitedBySearcher = false;
         this.player = false;
     }
 
@@ -24,12 +23,9 @@ class Cell {
      * Method returns coordinates of the position of the cell in the graph(maze).
      * @returns {string}
      */
-
-
     toString(){
         return `${this.levelNum},${this.rowNum},${this.colNum}`
     }
-
     get coordinates() {
         return `${this.levelNum},${this.rowNum},${this.colNum}`
     }

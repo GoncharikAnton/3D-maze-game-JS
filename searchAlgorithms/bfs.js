@@ -6,6 +6,11 @@ class BFS extends SearchAlgorithm{
         super();
         this.#numberOfNodesEvaluated = false;
     }
+    /**
+     * Method finds the path to get to the goal state from the start state.
+     * @param searchable unified search problem.
+     * @returns Set
+     */
     search(searchable){
         const goal = searchable.goalState; // str
         const queue = [];
@@ -30,6 +35,10 @@ class BFS extends SearchAlgorithm{
         return visited;
     }
 
+    /**
+     * Returns number of nodes required to make to get to the goal state.
+     * @returns Number
+     */
     getNumberOfNodesEvaluated() {
         return this.#numberOfNodesEvaluated
     }

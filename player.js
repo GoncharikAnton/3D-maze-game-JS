@@ -3,6 +3,12 @@ class Player{
     #currRow
     #currCol
 
+    /**
+     * Class represents a player.
+     * @param currLevel
+     * @param currRow
+     * @param currCol
+     */
     constructor(currLevel, currRow, currCol) {
         this.#currLevel = currLevel;
         this.#currRow = currRow;
@@ -35,6 +41,10 @@ class Player{
         return `${this.currLevel},${this.currRow},${this.currCol}`
     }
 
+    /**
+     * Method returns JSON representation of the player instance.
+     * @returns {{currRow: *, currCol: *, currLevel: *}}
+     */
     toJSON(){
         return {
             currLevel: this.currLevel,

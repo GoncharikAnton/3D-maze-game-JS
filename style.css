@@ -6,7 +6,6 @@
 
 #root {
     display: flex;
-    justify-content: center;
     margin: 10px;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -34,16 +33,8 @@
     width: 250px;
 }
 
-#level-header {
-    display: none;
-}
-
 #maze-section {
-    margin: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    flex-grow: 3;
-    justify-content: flex-start;
+    margin: 10px;
 }
 #control-buttons{
     display: none;
@@ -77,6 +68,7 @@ label {
 }
 
 .error {
+    width: 100%;
     background-color: crimson;
     border: 1px solid darkred;
     color: white;

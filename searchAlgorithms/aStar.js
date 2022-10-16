@@ -12,11 +12,24 @@ class AStar extends SearchAlgorithm{
             this.#position = position
         }
     }
+
+    /**
+     * Heuristic function.
+     * @param a String coordinates of the first node.
+     * @param b String coordinates of the second node.
+     * @returns {number}
+     */
     heuristic(a, b) {
         const [z1, y1, x1] = a.split(',');
         const [z2, y2, x2] = b.split(',');
         return Math.abs(z1 - z2) + Math.abs(y1 - y2) + Math.abs(x1 - x2);
     }
+
+    /**
+     * Method finds the shortest path to get to the goal state from the start state.
+     * @param searchable unified search problem.
+     * @returns Array
+     */
     search(searchable) {
         let start;
         if(this.#position){
@@ -69,6 +82,10 @@ class AStar extends SearchAlgorithm{
         return path;
     }
 
+    /**
+     * Returns number of nodes required to make to get to the goal state.
+     * @returns Number
+     */
     getNumberOfNodesEvaluated() {
         return this.#numberOfNodesEvaluated;
     }

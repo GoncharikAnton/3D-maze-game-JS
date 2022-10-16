@@ -1,11 +1,22 @@
 class MazeView{
     #maze
     #player
+
+    /**
+     * Class represents the view and representation methods of the maze game.
+     * @param maze Maze3D instance
+     * @param player Player instance
+     */
     constructor(maze, player) {
         this.#maze = maze;
         this.#player = player;
     }
 
+    /**
+     * Method renders a maze board on the page.
+     * @param rowInp
+     * @param colInp
+     */
     mazeView(rowInp = this.#maze.rows, colInp = this.#maze.cols){
         const mazeContainer = document.querySelector('#maze-container');
         const mazeLevelHeader = document.querySelector('#level-header');
@@ -53,6 +64,11 @@ class MazeView{
         }
     }
 
+    /**
+     * Method rerenders location of the player after the move.
+     * @param prevLocation string representation of the cell(node) coordinates
+     * @param nextLocation string representation of the cell(node) coordinates
+     */
     reRenderPlayerLocation(prevLocation, nextLocation){
         const prevDiv = document.querySelector(`[data-id="${prevLocation}"]`);
         const nextDiv = document.querySelector(`[data-id="${nextLocation}"]`);
@@ -64,6 +80,10 @@ class MazeView{
         nextDiv.innerHTML += `<image src="avatar.png" id="player">`;
     }
 
+    /**
+     * Method highlights (changes backgrund color) a cell for the next best move.
+     * @param location
+     */
     renderNextMove(location){
         let loc = location.split(',');
         let div;

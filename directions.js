@@ -1,3 +1,6 @@
+/**
+ * Represents possible directions in the maze.
+ */
 class Directions{
     #directions
     #rightDirection

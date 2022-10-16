@@ -1,3 +1,8 @@
+
+/**
+ *
+ * Class represents maze board instance.
+ */
 class Maze3D {
     #maze
     #entranceCell
@@ -39,16 +44,30 @@ class Maze3D {
         return this.#levels;
     }
 
+    /**
+     * Returns cell (node) of the maze instance.
+     * @param str
+     * @returns {*}
+     */
     getNodeByCoordinates(str) {
         let coordinates = str.split(',');
         return this.maze[+coordinates[0]][+coordinates[1]][+coordinates[2]];
     }
 
+    /**
+     * Returns VALID neighbors of the node by node's coordinates.
+     * @param coordinates String
+     * @returns {Set<*>}
+     */
     getNeighborsOfTheNode(coordinates) {
         const [i, j, k] = coordinates.split(',');
         return this.maze[i][j][k].getValidNeighbors(this.rows, this.cols);
     }
 
+    /**
+     * Method converts class instance to JSON object for stringifying.
+     * @returns {{exitCell, entranceCell, maze, rows, cols, levels}}
+     */
     toJSON() {
         return {
             maze: this.#maze,
@@ -60,6 +79,9 @@ class Maze3D {
         }
     }
 
+    /**
+     * Method represents console view of the maze.
+     */
     toString() {
         for (let i = 0; i < this.maze.length; i++) {
             console.log(`\nLevel ${i}\n`);

@@ -1,3 +1,12 @@
+/**
+ * Checks the input of user for validity and if it is valid returns positive result, in worst case
+ * function returns fail result and renders an error message to the user.
+ * @param form
+ * @param nameInp
+ * @param rowInp
+ * @param colInp
+ * @returns {boolean}
+ */
 export function formValidation(form, nameInp, rowInp, colInp){
         let validated = true;
         if (!nameInp.checkValidity()) {
@@ -15,7 +24,11 @@ export function formValidation(form, nameInp, rowInp, colInp){
         return validated;
 }
 
-
+/**
+ * Renders an error message to the user.
+ * @param nameInp
+ * @param inpTitle
+ */
 export function showErrorName(nameInp, inpTitle) {
     const nameError = document.querySelector(`#${inpTitle}`)
     if (nameInp.validity.valueMissing) {
@@ -25,23 +38,33 @@ export function showErrorName(nameInp, inpTitle) {
     }
     nameError.className = 'error';
 }
-
+/**
+ * Renders an error message to the user.
+ * @param i
+ * @param inpTitle
+ */
 export function showErrorNumInp(inp, inpTitle) {
     const inpTitleError = document.querySelector(`#${inpTitle}`); // row or col
     if (inp.validity.valueMissing) {
         inpTitleError.textContent = 'You need to enter a positive number.';
-    } else if (inp.validity.patternMismatch){
-        inpTitleError.textContent = 'Number must to be positive.';
+    } else{
+        inpTitleError.textContent = 'Number must to be positive and more than 2.';
     }
     inpTitleError.className = 'error';
 }
-
+/**
+ * Renders an error message to the user.
+ * @param nameInp
+ * @param inpTitle
+ */
 export function showErrorLoad(nameInp, inpTitle) {
     const nameError = document.querySelector(`#${inpTitle}`)
     nameError.textContent = 'There is no game with this name...'
     nameError.className = 'error';
 }
-
+/**
+ * Renders an error message to the user.
+ */
 export function clearErrorMessages(){
     const errorMessages = document.querySelectorAll('.error');
     for (const errorMessage of errorMessages) {

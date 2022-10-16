@@ -1,6 +1,10 @@
 import Maze3dGenerator from "../maze3DGenerator.js";
 import Randomizer from "../randomaizer.js";
 
+/**
+ * Class represents a generator that works with Aldous-Broder algorithm.
+ * Returns an instance of the generated maze.
+ */
 class AldousBroderMaze3dGenerator extends Maze3dGenerator {
     #maze
 

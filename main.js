@@ -12,10 +12,9 @@ const showNextMove = document.querySelector('#show-next-move-btn');
 const saveTheGame = document.querySelector('#save-the-game');
 const loadPreviewsGame = document.querySelector('#load-the-game');
 const nameOfPreviewsGameInp = document.querySelector('#last-game-name-inp');
-
 const selectedSearchAlgo = document.querySelector('#search-algo');
 
-let controller, intervalId;
+let controller, intervalId; // empty variables for future data passing.
 
 form.addEventListener('submit', e => {
     createGame(e);
@@ -25,7 +24,9 @@ loadPreviewsGame.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', e => {
-    controller.makeMove(e.key);
+    if(controller){
+        controller.makeMove(e.key);
+    }
 });
 resetBtn.addEventListener('click', () => {
     if (intervalId) {
@@ -51,12 +52,17 @@ saveTheGame.addEventListener('click', () => {
         MazeDBController.saveGame(nameInp.value, controller.maze, controller.player);
 });
 
-
+/**
+ * Display hided buttons for game control.
+ */
 function showControlBtns() {
     const controlBtns = document.querySelector('#control-buttons');
     controlBtns.style.display = 'block';
 }
 
+/**
+ * Checks user input and if it's valid, function creates the instance of controller with loaded data of the asked game.
+ */
 function loadPrevGame () {
     if (!nameOfPreviewsGameInp.checkValidity()) {
         showErrorName(nameOfPreviewsGameInp, 'loadError');
@@ -72,6 +78,11 @@ function loadPrevGame () {
         showControlBtns();
     }
 }
+
+/**
+ * Function validates user form input and creates a controller instance.
+ * @param e
+ */
 function createGame(e){
     const validated = formValidation(form, nameInp, rowInp, colInp);
     if (!validated) {

@@ -6,7 +6,11 @@ class DFS extends SearchAlgorithm{
         super();
         this.#numberOfNodesEvaluated = false;
     }
-
+    /**
+     * Method finds the path to get to the goal state from the start state.
+     * @param searchable unified search problem.
+     * @returns Set
+     */
     search(searchable){
         const initNode = searchable.initNode;
         const stack = [];
@@ -29,7 +33,10 @@ class DFS extends SearchAlgorithm{
         }
         return false
     }
-
+    /**
+     * Returns number of nodes required to make to get to the goal state.
+     * @returns Number
+     */
     getNumberOfNodesEvaluated() {
         return this.#numberOfNodesEvaluated;
     }
