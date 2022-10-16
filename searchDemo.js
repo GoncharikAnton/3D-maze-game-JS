@@ -22,15 +22,15 @@ class SearchDemo {
 
         const bfs = new BFS();
         const bfsIter = this.testSearchAlgorithm(bfs, searchable)
-        console.log('BFS-search iteration count: ', bfsIter[1]);
+        console.log('BFS-search nodes evaluated: ', bfsIter[1]);
 
         const dfs = new DFS()
         const dfsIter = this.testSearchAlgorithm(dfs, searchable)
-        console.log('DFS-search iteration count: ', dfsIter[1]);
+        console.log('DFS-search nodes evaluated: ', dfsIter[1]);
 
         const astar = new AStar();
         const astarIter = this.testSearchAlgorithm(astar, searchable)
-        console.log('AStar-search iteration count: ', astarIter[1]);
+        console.log('AStar-search nodes evaluated: ', astarIter[1]);
     }
 
     testSearchAlgorithm(searchAlgo, searchable) {

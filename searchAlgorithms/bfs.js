@@ -40,7 +40,6 @@ class BFS extends SearchAlgorithm {
             }
             let neighbors = searchable.getNeighbors(currNode[0]); // neighbors of the node represented by strings
             for (const neighbor of neighbors) {
-                console.log(neighbor)
                 const neigh = searchable.getNode(neighbor)
                 if (!visited.has(neigh.coordinates)) {
                     visited.add(neigh.coordinates);

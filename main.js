@@ -15,7 +15,7 @@ const loadPreviewsGame = document.querySelector('#load-the-game');
 const nameOfPreviewsGameInp = document.querySelector('#last-game-name-inp');
 const selectedSearchAlgo = document.querySelector('#search-algo');
 
-const demo = new SearchDemo(20,20);
+const demo = new SearchDemo(100,100);
 demo.run()
 
 let controller, intervalId; // empty variables for future data passing.
