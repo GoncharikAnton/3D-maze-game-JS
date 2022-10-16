@@ -1,4 +1,5 @@
 import SearchAlgorithm from "./searchAlgoAbstract.js";
+import Directions from "../directions.js";
 
 class BFS extends SearchAlgorithm {
     #numberOfNodesEvaluated
@@ -14,14 +15,16 @@ class BFS extends SearchAlgorithm {
      * @returns Set
      */
     search(searchable) {
-        const goal = searchable.goalState; // str
+        const goal = searchable.goalState; // str                                                       5
         const queue = [];
         const visited = new Set();
         const initNode = searchable.initNode // node object // initial-state
-        queue.push(initNode);
+        queue.push(initNode.coordinates);
         while (queue.length > 0) {
+
             const currNode = queue.pop();
-            const coordinates = currNode.toString(); // string representation of node
+
+            const coordinates = currNode.toString(); // string representation of the node
             if (coordinates === goal) {
                 this.#numberOfNodesEvaluated = visited.size;
                 return visited;
@@ -43,6 +46,23 @@ class BFS extends SearchAlgorithm {
      */
     getNumberOfNodesEvaluated() {
         return this.#numberOfNodesEvaluated
+    }
+
+
+    isLegalMove(prev, next){
+        const directions = new Directions().directions;
+        const prevCell = prev.split(',');
+
+        for (let i = 0; i < directions.length; i++) {
+            const z = directions[i][0];
+            const y = directions[i][1];
+            const x = directions[i][2];
+            let dir = `${+prevCell[0] + +z},${+prevCell[1] + +y},${+prevCell[2] + +x}`;
+            if(dir === next){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

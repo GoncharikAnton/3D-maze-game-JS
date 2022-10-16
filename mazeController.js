@@ -192,7 +192,7 @@ class MazeController {
             moveCount++;
             if (moveCount === numOfNodes) {
                 clearInterval(interval);
-                this.resetPosition();
+                // this.resetPosition();
             }
         }, 500);
         return interval;

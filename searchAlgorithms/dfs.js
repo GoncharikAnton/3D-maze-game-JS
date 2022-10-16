@@ -18,6 +18,8 @@ class DFS extends SearchAlgorithm {
         const stack = [];
         const visited = new Set();
         stack.push(initNode);
+        const path = [];
+        path.push(initNode.coordinates)
         while (stack.length > 0) {
             const currNode = stack.pop();
             if (!visited.has(currNode.toString())) {
@@ -33,7 +35,7 @@ class DFS extends SearchAlgorithm {
                 return visited;
             }
         }
-        return false
+        return false;
     }
 
     /**

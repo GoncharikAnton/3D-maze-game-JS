@@ -41,9 +41,7 @@ class AStar extends SearchAlgorithm {
         const goal = searchable.goalState;
         const frontier = new PriorityQueue((node1, node2) => node1[1] < node2[1]);
         frontier.push([start, 0]);
-        const cameFrom = new Map();
         const costSoFar = new Map();
-        cameFrom.set(start, null);
         costSoFar.set(start, 0);
         const toD = []
         while (!frontier.isEmpty()) {
@@ -58,7 +56,6 @@ class AStar extends SearchAlgorithm {
                     costSoFar.set(next, newCost);
                     priority = newCost + this.heuristic(next, goal);
                     frontier.push([next, priority]);
-                    cameFrom.set(currentLocation, next)
                     toD.push([currentLocation, next, newCost])
                 }
             }
@@ -90,8 +87,6 @@ class AStar extends SearchAlgorithm {
     getNumberOfNodesEvaluated() {
         return this.#numberOfNodesEvaluated;
     }
-
-
 }
 
 
